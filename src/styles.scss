@@ -1,1 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss/base.css";
+@import "tailwindcss/components.css";
+@import "tailwindcss/utilities.css";
+@import "primeicons/primeicons.css";
+
+html {
+  font-size: 14px;
+  line-height: 1.2;
+}
+.header-logo {
+  height: 30px;
+  width: auto;
+}

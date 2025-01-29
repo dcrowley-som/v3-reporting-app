@@ -1,0 +1,61 @@
+<div class="flex h-screen overflow-hidden">
+  <p-drawer styleClass="!w-full md:!w-80 lg:!w-[20rem]"
+    [(visible)]="showMenu" header="Menu" [modal]="false" [closeOnEscape]="false">
+    <ng-template #closeicon>
+      <i class="pi pi-arrow-left text-sky-300"></i>
+    </ng-template>
+    <div class="overflow-y-auto">
+      <ul class="list-none p-0 m-0">
+        <li>
+          <a pRipple [routerLink]="['/']"
+             class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">
+            <i class="pi pi-home mr-2"></i>
+            <span class="font-medium">Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <div
+            pRipple
+            pStyleClass="@next"
+            enterFromClass="hidden"
+            enterActiveClass="animate-slidedown"
+            leaveToClass="hidden"
+            leaveActiveClass="animate-slideup"
+            class="p-4 flex items-center justify-between cursor-pointer p-ripple text-sky-300  "
+          >
+            <span class="font-medium uppercase">Cases</span>
+            <i class="pi pi-chevron-down"></i>
+          </div>
+          <ul class="list-none p-0 m-0 overflow-hidden">
+            <li>
+              <a pRipple [routerLink]="['/', 'cases']"
+                 class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">
+                <i class="pi pi-table mr-2"></i>
+                <span class="font-medium">Overview</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </p-drawer>
+  <div class="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden bg-zinc-100"
+    [ngClass]="showMenu ? '!w-full md:!ml-80 lg:!ml-[20rem]' : ''">
+
+    <header class="sticky top-0 z-999 flex w-full justify-between bg-white drop-shadow p-1">
+      <div class="flex flex-grow-0 items-center">
+        <p-button icon="pi pi-bars" [rounded]="true" [text]="true" class="mr-2" (onClick)="toggleSideDrawer()" />
+        <a href="/">
+          <img class="header-logo" ngSrc="/logo-blue.png" alt="logo" height="328" width="1177" priority >
+        </a>
+      </div>
+      <div class="me-2">
+        <p-menu #userMenu [model]="userMenuItems" [popup]="true" appendTo="body" />
+        <p-button [rounded]="true" [outlined]="true" (onClick)="userMenu.toggle($event)" icon="pi pi-user" />
+      </div>
+    </header>
+    <div class="flex flex-col relative flex-1 p-6">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

@@ -15,6 +15,23 @@ export class EpisodeService {
     private appService: AppService
   ) {}
 
+  get dateRanges():any[] {
+    return [
+      {
+        label: 'FY-YTD'
+      },
+      {
+        label: 'CY-YTD'
+      }, {
+        label: 'Last CY'
+      }, {
+        label: 'MTD'
+      }, {
+        label: 'FY24'
+      }, { label: 'Custom' }
+    ];
+  }
+
   overview(selectedRange: string, dates: Date[] | undefined, groupBy: string) {
     let start = null;
     let end = null;
@@ -23,5 +40,15 @@ export class EpisodeService {
       end = dates[1];
     }
       return this.http.post<EpisodeOverviewResult>(this.apiUrl + 'reporting/episodes/overview', {selectedRange, start, end, groupBy}, this.appService.basicHeaders);
+  }
+
+  monthly(selectedRange: string, categories: string[], dates: Date[] | undefined) {
+    let start = null;
+    let end = null;
+    if (dates) {
+      start = dates[0];
+      end = dates[1];
+    }
+    return this.http.post<EpisodeOverviewResult>(this.apiUrl + 'reporting/episodes/monthly', {selectedRange, categories: { list: categories}, start, end}, this.appService.basicHeaders);
   }
 }

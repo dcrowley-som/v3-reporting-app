@@ -1,4 +1,5 @@
 <p-toast></p-toast>
+<p-confirm-dialog></p-confirm-dialog>
 <p-toolbar>
   <ng-template #start>
     <h2 class="text-2xl">Cases Overview</h2>
@@ -35,19 +36,54 @@
 
   <div class="mt-4 grid grid-cols-1 xl:grid-cols-2 gap-4">
     <div>
-      <p-card header="Categories">
-        <p-chart type="bar" [data]="categoryChartData()" [options]="categoryChartOptions" />
+      <p-card>
+        <ng-template #header>
+          <div class="flex justify-between items-center p-4">
+            <h4 class="font-medium text-xl">Categories</h4>
+            <div class="flex items-center">
+              <div class="text-sm me-3">Sort By</div>
+              <p-select size="small" [options]="sortCols" optionLabel="label"
+                        [(ngModel)]="sortCol" placeholder="Sort By"></p-select>
+            </div>
+          </div>
+        </ng-template>
+        <p-chart #categoriesChart
+          type="bar" [data]="categoryChartData()" [options]="categoryChartOptions"
+                 (onDataSelect)="onCategoriesChart($event)"
+        />
       </p-card>
       @if (servicesResult()) {
         <div class="mt-4">
-          <p-card header="Services">
-            <p-chart type="bar" [data]="servicesChartData()" [options]="categoryChartOptions"  />
+          <p-card>
+            <ng-template #header>
+              <div class="flex justify-between items-center p-4">
+                <h4 class="font-medium text-xl">Top 10 Services</h4>
+                <div class="flex items-center">
+                  <div class="text-sm me-3">Sort By</div>
+                  <p-select size="small" [options]="sortCols" optionLabel="label"
+                            [(ngModel)]="sortColServices" placeholder="Sort By"></p-select>
+                </div>
+              </div>
+            </ng-template>
+            <p-chart type="bar" [data]="servicesChartData()" [options]="categoryChartOptions"
+
+            />
           </p-card>
         </div>
       }
       @if (proceduresResult()) {
         <div class="mt-4">
-          <p-card header="Procedures">
+          <p-card>
+            <ng-template #header>
+              <div class="flex justify-between items-center p-4">
+                <h4 class="font-medium text-xl">Top 10 Procedures</h4>
+                <div class="flex items-center">
+                  <div class="text-sm me-3">Sort By</div>
+                  <p-select size="small" [options]="sortCols" optionLabel="label"
+                            [(ngModel)]="sortColProcedures" placeholder="Sort By"></p-select>
+                </div>
+              </div>
+            </ng-template>
             <p-chart type="bar" [data]="proceduresChartData()" [options]="categoryChartOptions"  />
           </p-card>
         </div>
@@ -56,7 +92,17 @@
     <div>
       @if (providersResult()) {
         <div>
-          <p-card header="Providers">
+          <p-card>
+            <ng-template #header>
+              <div class="flex justify-between items-center p-4">
+                <h4 class="font-medium text-xl">Providers</h4>
+                <div class="flex items-center">
+                  <div class="text-sm me-3">Sort By</div>
+                  <p-select size="small" [options]="sortCols" optionLabel="label"
+                            [(ngModel)]="sortColProviders" placeholder="Sort By"></p-select>
+                </div>
+              </div>
+            </ng-template>
             <p-chart height="1700px" type="bar" [data]="providersChartData()" [options]="categoryChartOptions"  />
           </p-card>
         </div>

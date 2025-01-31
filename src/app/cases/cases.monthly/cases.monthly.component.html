@@ -1,0 +1,54 @@
+<p-toast></p-toast>
+<p-confirm-dialog></p-confirm-dialog>
+<p-toolbar>
+  <ng-template #start>
+    <h2 class="text-2xl">Cases Monthly</h2>
+  </ng-template>
+  <ng-template #end>
+    <p-select [options]="dateRanges" [(ngModel)]="selectedDateRange" optionLabel="label" placeholder="Date Range" class="" />
+    <div [hidden]="customDates">
+      <p-floatlabel variant="on">
+        <p-datepicker class="ms-2"  inputId="custom_dates" showIcon iconDisplay="input"
+                      [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" [numberOfMonths]="2">
+
+        </p-datepicker>
+        <label>Custom Dates</label>
+      </p-floatlabel>
+    </div>
+    <p-button class="ms-2" icon="pi pi-refresh" label="Refresh" (onClick)="refresh()"></p-button>
+  </ng-template>
+</p-toolbar>
+@if (selectedResult() && prevResult()) {
+  <div class="grid grid-col-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3 mt-4">
+    <div class="bg-white shadow-sm border border-slate-200 p-4 rounded-lg flex flex-col items-center">
+      <h4 class="font-medium text-xl text-sky-500">Cases</h4>
+      <div class="flex w-full justify-center gap-2 text-sm">
+        <div class="text-sky-500">{{totals().selected.episodes | number}}</div>
+        <div class="text-stone-400">|</div>
+        <div class="text-amber-500">{{totals().prev.episodes | number}}</div>
+      </div>
+      <p-chart height="200"
+               type="line" [data]="episodeData()" [options]="topChartOptions" />
+    </div>
+    <div class="bg-white shadow-sm border border-slate-200 p-4 rounded-lg flex flex-col items-center">
+      <h4 class="font-medium text-xl text-teal-500">AN Minutes</h4>
+      <div class="flex w-full justify-center gap-2 text-sm">
+        <div class="text-sky-500">{{totals().selected.anMinutes | number}}</div>
+        <div class="text-stone-400">|</div>
+        <div class="text-amber-500">{{totals().prev.anMinutes | number}}</div>
+      </div>
+      <p-chart height="200"
+               type="line" [data]="anMinuteData()" [options]="topChartOptions" />
+    </div>
+    <div class="bg-white shadow-sm border border-slate-200 p-4 rounded-lg flex flex-col items-center">
+      <h4 class="font-medium text-xl text-indigo-500">In Room Minutes</h4>
+      <div class="flex w-full justify-center gap-2 text-sm">
+        <div class="text-sky-500">{{totals().selected.inRoomMinutes | number}}</div>
+        <div class="text-stone-400">|</div>
+        <div class="text-amber-500">{{totals().prev.inRoomMinutes | number}}</div>
+      </div>
+      <p-chart height="200"
+               type="line" [data]="inRoomMinuteData()" [options]="topChartOptions" />
+    </div>
+  </div>
+}

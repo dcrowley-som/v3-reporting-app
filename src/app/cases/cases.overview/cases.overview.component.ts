@@ -1,5 +1,5 @@
-import {Component, inject, linkedSignal, OnInit, signal} from '@angular/core';
-import {MenuItem, MessageService} from 'primeng/api';
+import {Component, inject, linkedSignal, OnInit, signal, ViewChild} from '@angular/core';
+import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
 import {Toolbar} from 'primeng/toolbar';
 import {Select} from 'primeng/select';
 import {FormsModule} from '@angular/forms';
@@ -8,24 +8,39 @@ import {FloatLabel} from 'primeng/floatlabel';
 import {Button} from 'primeng/button';
 import {EpisodeService} from '../../services/episode.service';
 import {Card} from 'primeng/card';
-import {EpisodeOverview, EpisodeOverviewCategory, EpisodeOverviewResult} from '../../models/episode-overview';
+import {EpisodeOverview, EpisodeOverviewCategory} from '../../models/episode-overview';
 import {DecimalPipe} from '@angular/common';
 import {Toast} from 'primeng/toast';
 import {UIChart} from 'primeng/chart';
-import {forkJoin, map, take} from 'rxjs';
+import {forkJoin, map} from 'rxjs';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-cases.overview',
-  imports: [Toolbar, Select, FormsModule, DatePicker, FloatLabel, Button, Card, DecimalPipe, Toast, UIChart],
+  imports: [Toolbar, Select, FormsModule, DatePicker, FloatLabel, Button, Card, DecimalPipe, Toast, UIChart,
+  ConfirmDialog],
   templateUrl: './cases.overview.component.html',
   standalone: true,
   styleUrl: './cases.overview.component.scss',
-  providers: [EpisodeService, MessageService]
+  providers: [MessageService, ConfirmationService]
 })
 export class CasesOverviewComponent implements OnInit {
+  @ViewChild(UIChart) categoriesChart: UIChart | undefined;
   dateRanges: MenuItem[] | undefined;
   selectedDateRange: MenuItem | undefined;
   rangeDates: Date[] | undefined;
+  sortCols: any[] = [{
+    id: 'episodes', label: 'Cases'
+  }, {
+    id: 'anMinutes', label: 'AN Minutes',
+  }, {
+    id: 'inRoomMinutes', label: "In Room Minutes"
+  }];
+  public sortCol = signal<any>(this.sortCols[0]);
+  public sortColServices = signal<any>(this.sortCols[0]);
+  public sortColProcedures = signal<any>(this.sortCols[0]);
+  public sortColProviders = signal<any>(this.sortCols[0]);
   public result = signal<EpisodeOverview>({
     _id: 'all',
     anMinutes: 0,
@@ -60,25 +75,52 @@ export class CasesOverviewComponent implements OnInit {
   });
   public categoryChartData = linkedSignal(() => {
     return {
-      labels: this.categories().map(cat => cat._id),
+      labels: this.categories()
+        .sort((a: any, b: any) => {
+          const aNum = a[this.sortCol().id];
+          const bNum = b[this.sortCol().id];
+          return bNum - aNum;
+        })
+        .map(cat => cat._id),
       datasets: [
         {
           label: "Cases",
           backgroundColor: 'rgba(14, 165, 233, .8)',
           borderColor: 'rgb(14, 165, 233)',
-          data: this.categories().map(cat => cat.episodes),
+          data: this.categories()
+            .sort((a: any, b: any) => {
+              const aNum = a[this.sortCol().id];
+              const bNum = b[this.sortCol().id];
+              return bNum - aNum;
+            })
+            .map(cat => cat.episodes),
+          hidden: this.sortCol().id !== 'episodes'
         },
         {
           label: "AN Minutes",
           backgroundColor: 'rgba(20, 184, 166, .8)',
           borderColor: 'rgb(20, 184, 166)',
-          data: this.categories().map(cat => cat.anMinutes),
+          data: this.categories()
+            .sort((a: any, b: any) => {
+              const aNum = a[this.sortCol().id];
+              const bNum = b[this.sortCol().id];
+              return bNum - aNum;
+            })
+            .map(cat => cat.anMinutes),
+          hidden: this.sortCol().id !== 'anMinutes'
         },
         {
           label: "In Room Minutes",
           backgroundColor: 'rgba(99, 102, 241, .8)',
           borderColor: 'rgb(0,0,0)',
-          data: this.categories().map(cat => cat.inRoomMinutes),
+          data: this.categories()
+            .sort((a: any, b: any) => {
+              const aNum = a[this.sortCol().id];
+              const bNum = b[this.sortCol().id];
+              return bNum - aNum;
+            })
+            .map(cat => cat.inRoomMinutes),
+          hidden: this.sortCol().id !== 'inRoomMinutes'
         }
       ]
     }
@@ -131,25 +173,52 @@ export class CasesOverviewComponent implements OnInit {
   });
   public servicesChartData = linkedSignal(() => {
     return {
-      labels: this.services().slice(0,10).map(cat => cat._id),
+      labels: this.services()
+        .sort((a: any, b: any) => {
+          const aNum = a[this.sortColServices().id];
+          const bNum = b[this.sortColServices().id];
+          return bNum - aNum;
+        })
+        .slice(0,10).map(cat => cat._id),
       datasets: [
         {
           label: "Cases",
           backgroundColor: 'rgba(14, 165, 233, .8)',
           borderColor: 'rgb(14, 165, 233)',
-          data: this.services().map(cat => cat.episodes),
+          data: this.services()
+            .sort((a: any, b: any) => {
+              const aNum = a[this.sortColServices().id];
+              const bNum = b[this.sortColServices().id];
+              return bNum - aNum;
+            })
+            .map(cat => cat.episodes),
+          hidden: this.sortColServices().id !== 'episodes'
         },
         {
           label: "AN Minutes",
           backgroundColor: 'rgba(20, 184, 166, .8)',
           borderColor: 'rgb(20, 184, 166)',
-          data: this.services().map(cat => cat.anMinutes),
+          data: this.services()
+            .sort((a: any, b: any) => {
+              const aNum = a[this.sortColServices().id];
+              const bNum = b[this.sortColServices().id];
+              return bNum - aNum;
+            })
+            .map(cat => cat.anMinutes),
+          hidden: this.sortColServices().id !== 'anMinutes'
         },
         {
           label: "In Room Minutes",
           backgroundColor: 'rgba(99, 102, 241, .8)',
           borderColor: 'rgb(0,0,0)',
-          data: this.services().map(cat => cat.inRoomMinutes),
+          data: this.services()
+            .sort((a: any, b: any) => {
+              const aNum = a[this.sortColServices().id];
+              const bNum = b[this.sortColServices().id];
+              return bNum - aNum;
+            })
+            .map(cat => cat.inRoomMinutes),
+          hidden: this.sortColServices().id !== 'inRoomMinutes'
         }
       ]
     }
@@ -159,25 +228,52 @@ export class CasesOverviewComponent implements OnInit {
   });
   public providersChartData = linkedSignal(() => {
     return {
-      labels: this.providers().map(cat => cat._id),
+      labels: this.providers()
+        .sort((a: any, b: any) => {
+          const aNum = a[this.sortColProviders().id];
+          const bNum = b[this.sortColProviders().id];
+          return bNum - aNum;
+        })
+        .map(cat => cat._id),
       datasets: [
         {
           label: "Cases",
           backgroundColor: 'rgba(14, 165, 233, .8)',
           borderColor: 'rgb(14, 165, 233)',
-          data: this.providers().map(cat => cat.episodes),
+          data: this.providers()
+            .sort((a: any, b: any) => {
+              const aNum = a[this.sortColProviders().id];
+              const bNum = b[this.sortColProviders().id];
+              return bNum - aNum;
+            })
+            .map(cat => cat.episodes),
+          hidden: this.sortColProviders().id !== 'episodes',
         },
         {
           label: "AN Minutes",
           backgroundColor: 'rgba(20, 184, 166, .8)',
           borderColor: 'rgb(20, 184, 166)',
-          data: this.providers().map(cat => cat.anMinutes),
+          data: this.providers()
+            .sort((a: any, b: any) => {
+              const aNum = a[this.sortColProviders().id];
+              const bNum = b[this.sortColProviders().id];
+              return bNum - aNum;
+            })
+            .map(cat => cat.anMinutes),
+          hidden: this.sortColProviders().id !== 'anMinutes',
         },
         {
           label: "In Room Minutes",
           backgroundColor: 'rgba(99, 102, 241, .8)',
           borderColor: 'rgb(0,0,0)',
-          data: this.providers().map(cat => cat.inRoomMinutes),
+          data: this.providers()
+            .sort((a: any, b: any) => {
+              const aNum = a[this.sortColProviders().id];
+              const bNum = b[this.sortColProviders().id];
+              return bNum - aNum;
+            })
+            .map(cat => cat.inRoomMinutes),
+          hidden: this.sortColProviders().id !== 'inRoomMinutes',
         }
       ]
     }
@@ -187,25 +283,52 @@ export class CasesOverviewComponent implements OnInit {
   });
   public proceduresChartData = linkedSignal(() => {
     return {
-      labels: this.procedures().slice(0,10).map(cat => cat._id.slice(0,20)),
+      labels: this.procedures()
+        .sort((a: any, b: any) => {
+          const aNum = a[this.sortColProcedures().id];
+          const bNum = b[this.sortColProcedures().id];
+          return bNum - aNum;
+        })
+        .slice(0,10).map(cat => cat._id.slice(0,20)),
       datasets: [
         {
           label: "Cases",
           backgroundColor: 'rgba(14, 165, 233, .8)',
           borderColor: 'rgb(14, 165, 233)',
-          data: this.procedures().map(cat => cat.episodes),
+          data: this.procedures()
+            .sort((a: any, b: any) => {
+              const aNum = a[this.sortColProcedures().id];
+              const bNum = b[this.sortColProcedures().id];
+              return bNum - aNum;
+            }).slice(0,10).map(cat => cat.episodes),
+          hidden: this.sortColProcedures().id !== 'episodes',
         },
         {
           label: "AN Minutes",
           backgroundColor: 'rgba(20, 184, 166, .8)',
           borderColor: 'rgb(20, 184, 166)',
-          data: this.procedures().map(cat => cat.anMinutes),
+          data: this.procedures()
+            .sort((a: any, b: any) => {
+              const aNum = a[this.sortColProcedures().id];
+              const bNum = b[this.sortColProcedures().id];
+              return bNum - aNum;
+            })
+            .slice(0,10).map(cat => cat.anMinutes),
+          hidden: this.sortColProcedures().id !== 'anMinutes',
         },
         {
           label: "In Room Minutes",
           backgroundColor: 'rgba(99, 102, 241, .8)',
           borderColor: 'rgb(0,0,0)',
-          data: this.procedures().map(cat => cat.inRoomMinutes),
+          data: this.procedures()
+            .sort((a: any, b: any) => {
+              const aNum = a[this.sortColProcedures().id];
+              const bNum = b[this.sortColProcedures().id];
+              return bNum - aNum;
+            })
+            .slice(0,10)
+            .map(cat => cat.inRoomMinutes),
+          hidden: this.sortColProcedures().id !== 'inRoomMinutes',
         }
       ]
     }
@@ -213,23 +336,13 @@ export class CasesOverviewComponent implements OnInit {
   constructor(
     private episodeService: EpisodeService,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
+    private router: Router
   ) {
   }
 
   ngOnInit(): void {
-    this.dateRanges = [
-      {
-        label: 'YTD'
-      }, {
-        label: 'MTD'
-      }, {
-         label: 'Last Year'
-      }, {
-        label: 'FY 25'
-      }, {
-        label: 'FY 24'
-      }, { label: 'Custom' }
-    ];
+    this.dateRanges = this.episodeService.dateRanges;
     this.selectedDateRange = this.dateRanges[0];
     this.refresh();
   }
@@ -276,5 +389,34 @@ export class CasesOverviewComponent implements OnInit {
         this.providersResult.set(allSources._providers.result);
         this.proceduresResult.set(allSources._procedures.result);
       });
+  }
+
+  onCategoriesChart(ev: any) {
+    const catStr = this.categories()[ev.element.index]._id;
+    this.confirmationService.confirm({
+      target: ev.target as EventTarget,
+      message: 'View Details for ' + catStr,
+      header: 'Confirmation',
+      closable: true,
+      closeOnEscape: true,
+      icon: 'pi pi-exclamation-triangle',
+      rejectButtonProps: {
+        label: 'Cancel',
+        severity: 'secondary'
+      },
+      acceptButtonProps: {
+        label: 'Yes',
+      },
+      accept: () => {
+        return this.router.navigate(['/', 'cases', 'monthly'], { queryParams: { cat1: catStr } });
+      },
+      reject: () => {
+        // do nothing
+      },
+    })
+  }
+
+  testChart() {
+    console.log(this.categoriesChart?.data);
   }
 }

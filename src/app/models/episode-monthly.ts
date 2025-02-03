@@ -19,3 +19,23 @@ export interface EpisodeMonthly {
 export interface EpisodeMonthlyResult {
   result: EpisodeMonthly[];
 }
+
+export interface EpisodeTableMonth {
+  year: number,
+  month: number
+  anMinutes: number;
+  inRoomMinutes: number;
+  episodes: number;
+}
+
+export interface EpisodeTable {
+  _id: {
+    category: string,
+  };
+  anMinutes: number;
+  inRoomMinutes: number;
+  episodes: number;
+  year: number;
+  month: number;
+  months: EpisodeMonthly[];
+}

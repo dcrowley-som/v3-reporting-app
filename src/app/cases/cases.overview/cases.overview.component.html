@@ -103,7 +103,8 @@
                 </div>
               </div>
             </ng-template>
-            <p-chart height="1700px" type="bar" [data]="providersChartData()" [options]="categoryChartOptions"  />
+            <p-chart (onDataSelect)="onProvidersChart($event)"
+              height="1700px" type="bar" [data]="providersChartData()" [options]="categoryChartOptions"  />
           </p-card>
         </div>
       }

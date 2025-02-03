@@ -1,12 +1,17 @@
+
 <p-toast></p-toast>
-<p-confirm-dialog></p-confirm-dialog>
 <p-toolbar>
   <ng-template #start>
-    <h2 class="text-2xl">Cases Monthly</h2>
+    <h2 class="flex items-center text-2xl">
+      Provider's Cases
+    </h2>
   </ng-template>
   <ng-template #end>
     <p-multi-select [options]="categories()" [(ngModel)]="selectedCategories" optionLabel="label" placeholder="Select Categories" [maxSelectedLabels]="20" styleClass="me-3 w-full md:w-80">
     </p-multi-select>
+    <p-select [options]="providersList()" [(ngModel)]="selectedProvider" optionLabel="searchable" [filter]="true" filterBy="searchable"
+              styleClass="me-2" [virtualScroll]="true" [virtualScrollItemSize]="38"
+              placeholder="Select Provider"></p-select>
     <p-select [options]="dateRanges" [(ngModel)]="selectedDateRange" optionLabel="label" placeholder="Date Range" class="" />
     <div [hidden]="customDates">
       <p-floatlabel variant="on">
@@ -20,7 +25,8 @@
     <p-button class="ms-2" icon="pi pi-refresh" label="Refresh" (onClick)="refresh()"></p-button>
   </ng-template>
 </p-toolbar>
-@if (selectedResult() && prevResult()) {
+
+@if (previous() && monthly()) {
   <div class="flex gap-2 items-center pt-4">
     @for (cat of selectedCategories; track cat.label) {
       <p-tag [value]="cat.label"/>
@@ -30,9 +36,9 @@
     <div class="bg-white shadow-sm border border-slate-200 p-4 rounded-lg flex flex-col items-center">
       <h4 class="font-medium text-xl text-sky-500">Cases</h4>
       <div class="flex w-full justify-center gap-2 text-sm">
-        <div class="text-sky-500">{{totals().selected.episodes | number}}</div>
+        <div class="text-sky-500">{{totals().monthly.episodes | number}}</div>
         <div class="text-stone-400">|</div>
-        <div class="text-amber-500">{{totals().prev.episodes | number}}</div>
+        <div class="text-amber-500">{{totals().previous.episodes | number}}</div>
       </div>
       <p-chart height="200"
                type="line" [data]="episodeData()" [options]="topChartOptions" />
@@ -40,9 +46,9 @@
     <div class="bg-white shadow-sm border border-slate-200 p-4 rounded-lg flex flex-col items-center">
       <h4 class="font-medium text-xl text-teal-500">AN Minutes</h4>
       <div class="flex w-full justify-center gap-2 text-sm">
-        <div class="text-teal-500">{{totals().selected.anMinutes | number}}</div>
+        <div class="text-teal-500">{{totals().monthly.anMinutes | number}}</div>
         <div class="text-stone-400">|</div>
-        <div class="text-amber-500">{{totals().prev.anMinutes | number}}</div>
+        <div class="text-amber-500">{{totals().previous.anMinutes | number}}</div>
       </div>
       <p-chart height="200"
                type="line" [data]="anMinuteData()" [options]="topChartOptions" />
@@ -50,9 +56,9 @@
     <div class="bg-white shadow-sm border border-slate-200 p-4 rounded-lg flex flex-col items-center">
       <h4 class="font-medium text-xl text-indigo-500">In Room Minutes</h4>
       <div class="flex w-full justify-center gap-2 text-sm">
-        <div class="text-indigo-500">{{totals().selected.inRoomMinutes | number}}</div>
+        <div class="text-indigo-500">{{totals().monthly.inRoomMinutes | number}}</div>
         <div class="text-stone-400">|</div>
-        <div class="text-amber-500">{{totals().prev.inRoomMinutes | number}}</div>
+        <div class="text-amber-500">{{totals().previous.inRoomMinutes | number}}</div>
       </div>
       <p-chart height="200"
                type="line" [data]="inRoomMinuteData()" [options]="topChartOptions" />
@@ -60,12 +66,14 @@
   </div>
 
   <p-panel styleClass="mt-4">
-    <p-table [columns]="selectedResult()" [value]="tableData()">
+    <p-table [columns]="tableHeaders()" [value]="tableData()">
       <ng-template #caption>
         <div class="flex justify-between items-center">
-          <div class="text-xl font-bold">By Category</div>
-          @if (totals().selected.episodes > 0) {
-            <p-button size="small" icon="pi pi-table" label="Details" (onClick)="showDetails()"></p-button>
+          <div class="text-xl font-bold">
+            Monthly
+          </div>
+          @if (monthly().length) {
+          <p-button size="small" icon="pi pi-table" label="Details" (onClick)="showDetails()"></p-button>
           }
           <div class="flex flex-wrap gap-4">
             <div class="flex items-center">
@@ -86,29 +94,23 @@
       </ng-template>
       <ng-template #header let-columns>
         <tr>
-          <th>Category</th>
-          <th *ngFor="let col of columns">
-            {{col | episodeMonthlyColumn}}
-          </th>
-          <th>Total</th>
+        <th *ngFor="let col of columns">
+          {{col}}
+        </th>
         </tr>
       </ng-template>
       <ng-template #body let-row let-columns="columns">
         <tr>
-          <td>{{row.selected._id.category}}</td>
           <td *ngFor="let col of columns; let i = index;">
-            {{row.selected.months[i][tableMetric] | number}}
-          </td>
-          <td>
-            {{row.selected[tableMetric] | number}}
+            {{row.current[i][tableMetric] | number}}
           </td>
         </tr>
-        <tr>
-          <td class="text-amber-600">{{row.previous._id.category}}</td>
-          <td *ngFor="let col of columns; let i = index;" class="text-amber-600">
-            {{row.previous.months[i][tableMetric] | number}}
+        <tr >
+          <td *ngFor="let col of columns; let i = index;"
+              class="text-amber-500"
+          >
+            {{row.previous[i][tableMetric] | number}}
           </td>
-          <td class="text-amber-500">{{row.previous[tableMetric] | number}}</td>
         </tr>
       </ng-template>
     </p-table>

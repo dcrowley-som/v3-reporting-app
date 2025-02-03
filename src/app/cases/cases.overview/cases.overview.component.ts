@@ -391,6 +391,31 @@ export class CasesOverviewComponent implements OnInit {
       });
   }
 
+  onProvidersChart(ev: any) {
+    const catStr = this.providers()[ev.element.index]._id;
+    this.confirmationService.confirm({
+      target: ev.target as EventTarget,
+      message: 'View Details for ' + catStr,
+      header: 'Confirmation',
+      closable: true,
+      closeOnEscape: true,
+      icon: 'pi pi-exclamation-triangle',
+      rejectButtonProps: {
+        label: 'Cancel',
+        severity: 'secondary'
+      },
+      acceptButtonProps: {
+        label: 'Yes',
+      },
+      accept: () => {
+        return this.router.navigate(['/', 'cases', 'provider'], { queryParams: { provider: catStr } });
+      },
+      reject: () => {
+        // do nothing
+      },
+    })
+  }
+
   onCategoriesChart(ev: any) {
     const catStr = this.categories()[ev.element.index]._id;
     this.confirmationService.confirm({
@@ -416,7 +441,4 @@ export class CasesOverviewComponent implements OnInit {
     })
   }
 
-  testChart() {
-    console.log(this.categoriesChart?.data);
-  }
 }

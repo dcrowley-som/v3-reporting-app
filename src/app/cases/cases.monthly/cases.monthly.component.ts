@@ -1,8 +1,8 @@
-import {Component, linkedSignal, OnInit, signal} from '@angular/core';
+import {Component, effect, linkedSignal, OnInit, signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {EpisodeService} from '../../services/episode.service';
 import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
-import {EpisodeMonthly} from '../../models/episode-monthly';
+import {EpisodeMonthly, EpisodeTable} from '../../models/episode-monthly';
 import {forkJoin, map} from 'rxjs';
 import {Button} from 'primeng/button';
 import {ConfirmDialog} from 'primeng/confirmdialog';
@@ -12,8 +12,15 @@ import {Select} from 'primeng/select';
 import {Toast} from 'primeng/toast';
 import {Toolbar} from 'primeng/toolbar';
 import {FormsModule} from '@angular/forms';
-import {DecimalPipe, JsonPipe} from '@angular/common';
+import {DecimalPipe, NgForOf} from '@angular/common';
 import {UIChart} from 'primeng/chart';
+import {MultiSelect} from 'primeng/multiselect';
+import {Panel} from 'primeng/panel';
+import {TableModule} from 'primeng/table';
+import {EpisodeMonthlyColumnPipe} from '../../pipes/episode-monthly-column.pipe';
+import {Tag} from 'primeng/tag';
+import {RadioButton} from 'primeng/radiobutton';
+import {CasesParams} from '../../models/cases-params';
 
 @Component({
   selector: 'app-cases.monthly',
@@ -28,7 +35,13 @@ import {UIChart} from 'primeng/chart';
     FormsModule,
     DecimalPipe,
     UIChart,
-    JsonPipe
+    MultiSelect,
+    Panel,
+    TableModule,
+    NgForOf,
+    EpisodeMonthlyColumnPipe,
+    Tag,
+    RadioButton
   ],
   templateUrl: './cases.monthly.component.html',
   styleUrl: './cases.monthly.component.scss',
@@ -38,11 +51,16 @@ import {UIChart} from 'primeng/chart';
 export class CasesMonthlyComponent implements OnInit {
   public selectedResult = signal<EpisodeMonthly[]>([]);
   public prevResult = signal<EpisodeMonthly[]>([]);
+  public tableResult = signal<EpisodeTable[]>([]);
+  public prevTableResult = signal<EpisodeTable[]>([]);
+  public categories = signal<any[]>([]);
   private queryParams: any;
+  tableMetric = 'episodes';
   dateRanges: MenuItem[] | undefined;
   selectedDateRange: MenuItem | undefined;
   rangeDates: Date[] | undefined;
-  selectedCategories: string[] = [];
+  selectedCategories: any[] = [];
+  topChartOptions: any;
   public totals = signal<any>({
     selected: {
       episodes: 0,
@@ -91,58 +109,28 @@ export class CasesMonthlyComponent implements OnInit {
   public inRoomMinuteData = linkedSignal(() => {
     return this.chartData('inRoomMinutes', 99, 102, 241);
   });
+  public tableData = linkedSignal(() => {
+    const ret = [
+    ];
 
-  public topChartOptions = {
-    maintainAspectRatio: false,
-    aspectRatio: 0.5,
-    plugins: {
-      legend: {
-        labels: {
-          color: 'grey',
-          font: {
-            weight: 300
-          }
-        }
+      for (const [i, v] of this.tableResult().entries()) {
+        ret.push({
+          selected: v,
+          previous: this.prevTableResult()[i]
+        });
       }
-    },
-    scales: {
-      x: {
-        ticks: {
-          color: 'grey',
-          font: {
-            weight: 400,
-            size: 9
-          }
-        },
-        grid: {
-          color: 'lightgray',
-          drawBorder: false
-        }
-      },
-      y: {
-        ticks: {
-          color: 'grey',
-          font: {
-            weight: 400,
-            size: 9
-          }
-        },
-        grid: {
-          color: 'lightgray',
-          drawBorder: false
-        }
-      }
-    }
-  };
-
-
+      return ret;
+  });
 
   constructor(
     private route: ActivatedRoute,
     private episodeService: EpisodeService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService,
   ) {
+    // effect(() => {
+    //   // console.log( this.tableData() )
+    // });
+    this.topChartOptions = episodeService.topChartOptions;
   }
 
   ngOnInit() {
@@ -156,9 +144,19 @@ export class CasesMonthlyComponent implements OnInit {
     this.refresh();
   }
 
+  showDetails() {
+    this.episodeService.casesParams = <CasesParams>{
+      selectedRange: this.selectedDateRange!.label as string,
+      dates: this.rangeDates ? this.rangeDates : undefined,
+      categories: this.selectedCategories.map((row: any) => row.label)
+    };
+  }
+
   private parseCategoryParams() {
     if (this.queryParams.cat1) {
-      this.selectedCategories = this.queryParams.cat1.split(',');
+      this.selectedCategories = this.queryParams.cat1.split(',').map((row: string) => {
+        return { label: row }
+      });
     }
   }
 
@@ -167,6 +165,9 @@ export class CasesMonthlyComponent implements OnInit {
   }
 
   refresh() {
+    const catStr = this.selectedCategories.map((row: any) => {
+      return row.label;
+    });
     if (!this.selectedDateRange) {
       this.messageService.add({ severity: 'warn', summary: 'Missing Parameters', detail: 'Please select a date range.' });
       return;
@@ -178,18 +179,43 @@ export class CasesMonthlyComponent implements OnInit {
       return;
     }
     const sources = [
-      this.episodeService.monthly(this.selectedDateRange!.label as string, this.selectedCategories, this.rangeDates),
-      this.episodeService.monthly('PREV-' + this.selectedDateRange!.label as string, this.selectedCategories, this.rangeDates)
+      this.episodeService.selectLists(),
+      this.episodeService.monthly(this.selectedDateRange!.label as string, catStr, this.rangeDates),
+      this.episodeService.monthly('PREV-' + this.selectedDateRange!.label as string, catStr, this.rangeDates),
+      this.episodeService.table(this.selectedDateRange!.label as string, catStr, this.rangeDates),
+      this.episodeService.table('PREV-' + this.selectedDateRange!.label as string, catStr, this.rangeDates)
     ];
 
     forkJoin(sources)
-      .pipe(map(([_selected, _prev]) => {
+      .pipe(map(([_lists, _selected, _prev, _table, _table_prev]) => {
         return {
+          _lists: _lists,
           _selected: _selected,
-          _prev: _prev
+          _prev: _prev,
+          _table: _table,
+          _table_prev: _table_prev
         }
       }))
       .subscribe((all: any) => {
+        this.categories.set(all._lists.cat1.map((row: any) => {
+          return { label: row };
+        }));
+        // const prevMatch = [];
+        // for (const row of all._selected.result) {
+        //   const found = all._prev.result.find((item: any) => {
+        //     return (item._id.year + 1) === row._id.year && item._id.month === row._id.month;
+        //   });
+        //   if (found) {
+        //     prevMatch.push(found);
+        //   } else {
+        //     prevMatch.push({
+        //       _id: row._id,
+        //       episodes: 0,
+        //       anMinutes: 0,
+        //       inRoomMinutes: 0
+        //     });
+        //   }
+        // }
         const t = {
           selected: {
             episodes: 0,
@@ -212,11 +238,12 @@ export class CasesMonthlyComponent implements OnInit {
           t.prev.anMinutes += row.anMinutes;
           t.prev.inRoomMinutes += row.inRoomMinutes;
         }
+
         this.totals.set(t);
         this.selectedResult.set(all._selected.result);
         this.prevResult.set(all._prev.result);
-
-
+        this.tableResult.set(all._table.result);
+        this.prevTableResult.set(all._table_prev.result);
       });
   }
 

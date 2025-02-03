@@ -1,4 +1,5 @@
 <div class="flex h-screen overflow-hidden">
+  <app-cases-details [casesParams]="detailsParams"></app-cases-details>
   <p-drawer styleClass="!w-full md:!w-80 lg:!w-[20rem]"
     [(visible)]="showMenu" header="Menu" [modal]="false" [closeOnEscape]="false">
     <ng-template #closeicon>
@@ -113,14 +114,14 @@
               </a>
             </li>
             <li>
-              <a pRipple [routerLink]="['/', 'cases']"
+              <a pRipple [routerLink]="['/', 'cases', 'monthly']"
                  class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">
                 <i class="pi pi-calendar mr-2"></i>
                 <span class="font-medium">By Month</span>
               </a>
             </li>
             <li>
-              <a pRipple [routerLink]="['/', 'cases']"
+              <a pRipple [routerLink]="['/', 'cases', 'provider']"
                  class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">
                 <i class="pi pi-user mr-2"></i>
                 <span class="font-medium">For Provider</span>
@@ -179,6 +180,9 @@
     </header>
     <div class="flex flex-col flex-1 p-6">
       <router-outlet></router-outlet>
+      <p class="p-5 text-xs">
+        v{{appVersion}}
+      </p>
     </div>
   </div>
 </div>

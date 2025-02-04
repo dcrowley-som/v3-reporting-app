@@ -4,6 +4,8 @@ import {CasesOverviewComponent} from './cases/cases.overview/cases.overview.comp
 import {DashboardComponent} from './dashboard/dashboard.component';
 import {CasesMonthlyComponent} from './cases/cases.monthly/cases.monthly.component';
 import {CasesProviderComponent} from './cases/cases.provider/cases.provider.component';
+import {AssignmentsOverviewComponent} from './assignments/assignments.overview/assignments.overview.component';
+import {AssignmentsProviderComponent} from './assignments/assignments.provider/assignments.provider.component';
 
 export const routes: Routes = [
   {
@@ -24,6 +26,14 @@ export const routes: Routes = [
       {
         path: 'cases/provider',
         component: CasesProviderComponent
+      },
+      {
+        path: 'assignments',
+        component: AssignmentsOverviewComponent
+      },
+      {
+        path: 'assignments/provider',
+        component: AssignmentsProviderComponent
       }
     ]
   }

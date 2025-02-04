@@ -6,7 +6,7 @@ import {MenuItem} from 'primeng/api';
 import {NgClass, NgOptimizedImage} from '@angular/common';
 import {Ripple} from 'primeng/ripple';
 import {StyleClass} from 'primeng/styleclass';
-import {Router, RouterLink, RouterOutlet} from '@angular/router';
+import {RouterLink, RouterOutlet} from '@angular/router';
 import {EpisodeService} from '../services/episode.service';
 import {CasesDetailsComponent} from '../cases/cases.details/cases.details.component';
 import {CasesParams} from '../models/cases-params';
@@ -42,7 +42,7 @@ export class AppLayoutComponent {
     this.episodeService.casesParams$.subscribe((data: any) => {
       this.detailsParams = data;
     });
-    this.appVersion = appService.appVersion;
+    this.appVersion = this.appService.appVersion;
     this.userMenuItems = [
       {
         label: 'tester@som.umaryland.edu',

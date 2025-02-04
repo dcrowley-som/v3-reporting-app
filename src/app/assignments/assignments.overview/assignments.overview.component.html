@@ -1,0 +1,50 @@
+<p-toolbar>
+  <ng-template #start>
+    <h2 class="text-2xl">Assignments Overview</h2>
+  </ng-template>
+  <ng-template #end>
+    <div>
+
+      <p-datepicker class="ms-2"  inputId="custom_dates" showIcon iconDisplay="input"
+                    [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" [numberOfMonths]="2">
+
+      </p-datepicker>
+
+
+    </div>
+    <p class="px-5 text-zinc-400">max 5 days</p>
+    <p-button class="ms-2" icon="pi pi-refresh" label="Refresh" (onClick)="refresh()"></p-button>
+  </ng-template>
+</p-toolbar>
+@if (rows().length) {
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mt-4">
+    @for (row of rows(); track row._id) {
+      <p-card styleClass="p-2">
+        <ng-template #header>
+          <h3 class="text-xl text-primary flex justify-center px-2 pt-2 font-medium">{{row._id.date | date}}</h3>
+        </ng-template>
+        <p-accordion [value]="0">
+          @for (tab of row.schedules | sortOverviewSchedules; track tab._id; let i = $index) {
+            <p-accordion-panel [value]="i">
+              <p-accordion-header>
+                <span class="text-violet-700">{{tab._id.schedule.name}}</span>
+              </p-accordion-header>
+              <p-accordion-content>
+                <ul class="list-disc text-sm">
+                  @for (user of tab.users | sortOverviewScheduleUsers; track user._id) {
+                    <li [routerLink]="['/', 'assignments', 'provider']"  [queryParams]="{provider: user._id.lName + '__' + user._id.fName}" class="cursor-pointer hover:bg-stone-100">
+                      {{user._id.lName + ', ' + user._id.fName}}
+                      @for (ass of user.assignments; track ass._id) {
+                        <p-tag [value]="ass.aName"></p-tag>
+                      }
+                    </li>
+                  }
+                </ul>
+              </p-accordion-content>
+            </p-accordion-panel>
+          }
+        </p-accordion>
+      </p-card>
+    }
+  </div>
+}

@@ -413,7 +413,7 @@ export class CasesOverviewComponent implements OnInit {
       reject: () => {
         // do nothing
       },
-    })
+    });
   }
 
   onCategoriesChart(ev: any) {

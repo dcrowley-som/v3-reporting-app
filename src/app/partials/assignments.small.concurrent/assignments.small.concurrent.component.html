@@ -1,0 +1,20 @@
+@if (concurrents() && episodes()) {
+<!--  <div><small class="uppercase me-2">Total AN Minutes</small> {{concurrents().minutes}}</div>-->
+<!--  <ul>-->
+<!--    @for (conc of concurrents().concurrentCasesArr; track conc) {-->
+<!--      <li>-->
+<!--        <p-tag severity="secondary" [value]="episodes()![conc.a].episodeId"></p-tag> / <p-tag severity="secondary" [value]="episodes()![conc.b].episodeId"></p-tag> : <small>{{conc.minutes}}</small>-->
+<!--      </li>-->
+<!--    }-->
+<!--  </ul>-->
+  <ul>
+    @for (conc of concurrents().concurrentCasesArr; track conc) {
+
+      <li class="conc-bar p-1" [style]="{'margin-left': conc.startPerc + '%', 'width': conc.sizePerc + '%'}">
+        <small>{{conc.episodeId}}</small>
+      </li>
+    }
+  </ul>
+
+}
+

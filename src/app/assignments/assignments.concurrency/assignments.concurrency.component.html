@@ -1,0 +1,76 @@
+<p-toast></p-toast>
+<p-toolbar>
+  <ng-template #start>
+    <h2 class="flex items-center text-2xl">
+      Provider's Concurrency
+    </h2>
+  </ng-template>
+  <ng-template #end>
+    <p-select [options]="assignmentsList()" [(ngModel)]="selectedAssignment" optionLabel="label" [filter]="true" filterBy="label"
+              styleClass="me-2" [virtualScroll]="true" [virtualScrollItemSize]="38"
+              placeholder="Select Assignment"></p-select>
+    <p-select [options]="providersList()" [(ngModel)]="selectedProvider" optionLabel="searchable" [filter]="true" filterBy="searchable"
+              styleClass="me-2" [virtualScroll]="true" [virtualScrollItemSize]="38"
+              placeholder="Select Provider"></p-select>
+    <p-select [options]="dateRanges" [(ngModel)]="selectedDateRange" optionLabel="label" placeholder="Date Range" class="" />
+    <div [hidden]="customDates">
+      <p-floatlabel variant="on">
+        <p-datepicker class="ms-2"  inputId="custom_dates" showIcon iconDisplay="input"
+                      [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" [numberOfMonths]="2">
+
+        </p-datepicker>
+        <label>Custom Dates</label>
+      </p-floatlabel>
+    </div>
+    <p-button class="ms-2" icon="pi pi-refresh" label="Refresh" (onClick)="refresh()"></p-button>
+  </ng-template>
+</p-toolbar>
+@if (isLoading) {
+  <div class="card flex justify-center mt-4">
+    <p-progress-spinner [style]="{ width: '50px', height: '50px' }" />
+  </div>
+}
+@if (results().length) {
+  <p-panel styleClass="mt-4">
+
+    <p-table #ct [value]="results()" [scrollable]="true" scrollHeight="60vh" [exportFilename]="downloadName"
+             selectionMode="single" [(selection)]="selectedRow" dataKey="date" (onRowSelect)="onRowSelect($event)"
+             [virtualScroll]="true" [virtualScrollItemSize]="60">
+      <ng-template #caption>
+        <div class="flex justify-between items-center">
+          <div class="text-xl font-bold">Daily Case Concurrency in Minutes</div>
+          <p-button icon="pi pi-external-link" label="Export" (click)="ct.exportCSV()" />
+        </div>
+      </ng-template>
+      <ng-template #header>
+        <tr>
+          <th>Date</th>
+          <th>Assigned</th>
+          <th>Active</th>
+          <th>0</th>
+          <th>1</th>
+          <th>2</th>
+          <th>3</th>
+          <th>4</th>
+          <th>>4</th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-row>
+        <tr [pSelectableRow]="row">
+          <td>{{row.date | date: 'shortDate'}}</td>
+          <td>{{totalMinutes}}</td>
+          <td [ngClass]="row.count > totalMinutes ? 'text-red-500' : ''">{{row.count}}</td>
+          <td>{{(totalMinutes - row.count) > 0 ? totalMinutes - row.count : 0}}</td>
+          <td>{{row.hasOne}}</td>
+          <td>{{row.hasTwo}}</td>
+          <td>{{row.hasThree}}</td>
+          <td>{{row.hasFour}}</td>
+          <td [ngClass]="row.overFour > 0 ? 'text-red-500': ''"
+          >{{row.overFour}}</td>
+        </tr>
+      </ng-template>
+
+    </p-table>
+  </p-panel>
+}

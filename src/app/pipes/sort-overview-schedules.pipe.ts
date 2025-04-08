@@ -11,7 +11,7 @@ export class SortOverviewSchedulesPipe implements PipeTransform {
       return [];
     }
     return schedules.sort((a: any, b:any) => {
-      return a._id.schedule.name.toLowerCase() > b._id.schedule.name.toLowerCase() ? -1 : 1;
+      return a._id.schedule.name.toLowerCase() > b._id.schedule.name.toLowerCase() ? 1 : -1;
     });
   }
 

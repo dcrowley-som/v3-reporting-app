@@ -1,0 +1,112 @@
+<!--<p-toolbar>-->
+<!--  <ng-template #start>-->
+<!--    <h2 class="text-2xl">Unmatched Cases</h2>-->
+<!--  </ng-template>-->
+<!--  <ng-template #end>-->
+<!--    <p-select [options]="dateRanges" [(ngModel)]="selectedDateRange" optionLabel="label" placeholder="Date Range" class="" />-->
+<!--    <div [hidden]="customDates">-->
+<!--      <p-floatlabel variant="on">-->
+<!--        <p-datepicker class="ms-2"  inputId="custom_dates" showIcon iconDisplay="input"-->
+<!--                      [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" [numberOfMonths]="2">-->
+
+<!--        </p-datepicker>-->
+<!--        <label>Custom Dates</label>-->
+<!--      </p-floatlabel>-->
+<!--    </div>-->
+<!--    <p-button class="ms-2" icon="pi pi-refresh" label="Refresh" (onClick)="refresh()"></p-button>-->
+<!--  </ng-template>-->
+<!--</p-toolbar>-->
+<!--@if (isLoading) {-->
+<!--  <div class="card flex justify-center mt-4">-->
+<!--    <p-progress-spinner [style]="{ width: '50px', height: '50px' }" />-->
+<!--  </div>-->
+<!--}-->
+<!--@if (rows().length) {-->
+
+<!--  <p-panel>-->
+
+<!--    <p-table #dt [columns]="cols" [value]="rows()" stripedRows [scrollable]="true" scrollHeight="60vh" size="small"-->
+<!--             [virtualScroll]="true" [virtualScrollItemSize]="36" [exportFilename]="downloadName"-->
+<!--             [globalFilterFields]="['responsibleProvName']" styleClass="text-sm"-->
+<!--             selectionMode="single" [(selection)]="selectedRow" dataKey="_id" (onRowSelect)="onRowSelect($event)"-->
+<!--    >-->
+<!--      <ng-template #caption>-->
+<!--        <div class="flex justify-between pb-4">-->
+<!--          <div class="text-xl me-4">-->
+<!--            <span class="text-primary me-4">Date Range</span>-->
+<!--            <span class="font-bold">{{selectedRange}}</span>-->
+<!--          </div>-->
+<!--          <div class="text-xl font-bold">{{rows().length}} Cases</div>-->
+<!--          @if (!casesParams()?.user) {-->
+<!--            <p-iconfield iconPosition="left">-->
+<!--              <p-inputicon>-->
+<!--                <i class="pi pi-search"></i>-->
+<!--              </p-inputicon>-->
+<!--              <input-->
+<!--                pInputText-->
+<!--                type="text"-->
+<!--                (input)="onFilter($event)"-->
+<!--                placeholder="Search Provider"-->
+<!--              >-->
+<!--            </p-iconfield>-->
+<!--          }-->
+<!--          <p-button icon="pi pi-external-link" label="Export" (click)="dt.exportCSV()" />-->
+<!--        </div>-->
+<!--        <div class="flex gap-2 items-center overflow-x-hidden mb-4">-->
+<!--          @for (cat of casesParams()?.categories; track cat) {-->
+<!--            <p-tag [value]="cat"/>-->
+<!--          }-->
+<!--        </div>-->
+<!--      </ng-template>-->
+<!--      <ng-template #header>-->
+<!--        <tr>-->
+<!--          <th pSortableColumn="date">-->
+<!--            Date <p-sortIcon field="date"></p-sortIcon>-->
+<!--          </th>-->
+<!--          @if (!casesParams()?.user) {-->
+<!--            <th pSortableColumn="responsibleProvName">-->
+<!--              Provider <p-sortIcon field="responsibleProvName"></p-sortIcon>-->
+<!--            </th>-->
+<!--          }-->
+<!--          <th pSortableColumn="cat1">-->
+<!--            Category <p-sortIcon field="cat1"></p-sortIcon>-->
+<!--          </th>-->
+<!--          <th pSortableColumn="episodeId">-->
+<!--            Episode <p-sortIcon field="episodeId"></p-sortIcon>-->
+<!--          </th>-->
+<!--          <th pSortableColumn="service">-->
+<!--            Service <p-sortIcon field="service"></p-sortIcon>-->
+<!--          </th>-->
+<!--          <th pSortableColumn="procedure">-->
+<!--            Procedure <p-sortIcon field="procedure"></p-sortIcon>-->
+<!--          </th>-->
+<!--          <th pSortableColumn="primaryPhysicianName">-->
+<!--            Physician <p-sortIcon field="primaryPhysicianName"></p-sortIcon>-->
+<!--          </th>-->
+<!--          <th pSortableColumn="anMinutes">-->
+<!--            AN Minutes <p-sortIcon field="anMinutes"></p-sortIcon>-->
+<!--          </th>-->
+<!--          <th pSortableColumn="inRoomMinutes">-->
+<!--            In Room Minutes <p-sortIcon field="inRoomMinutes"></p-sortIcon>-->
+<!--          </th>-->
+<!--          <th></th>-->
+<!--        </tr>-->
+<!--      </ng-template>-->
+<!--      <ng-template #body let-row>-->
+<!--        <tr style="height:36px" [pSelectableRow]="row">-->
+<!--          <td>{{row.date | date: 'shortDate'}}</td>-->
+<!--          @if (!casesParams()?.user) {-->
+<!--            <td>{{row.responsibleProvName | slice: 0 : 20}}</td>-->
+<!--          }-->
+<!--          <td>{{row.cat1}}</td>-->
+<!--          <td>{{row.episodeId}}</td>-->
+<!--          <td>{{row.procedure | slice: 0 :20}}</td>-->
+<!--          <td>{{row.service}}</td>-->
+<!--          <td>{{row.primaryPhysicianName}}</td>4-->
+<!--          <td>{{row.anMinutes | number}}</td>-->
+<!--          <td>{{row.inRoomMinutes | number}}</td>-->
+<!--        </tr>-->
+<!--      </ng-template>-->
+<!--    </p-table>-->
+<!--  </p-panel>-->
+<!--}-->

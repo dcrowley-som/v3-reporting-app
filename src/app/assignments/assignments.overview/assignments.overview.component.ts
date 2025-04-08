@@ -1,10 +1,8 @@
 import {Component, OnInit, signal} from '@angular/core';
 import {AssignmentService} from '../../services/assignment.service';
-import {MessageService} from 'primeng/api';
+import {ConfirmationService, MessageService} from 'primeng/api';
 import {Button} from 'primeng/button';
 import {DatePicker} from 'primeng/datepicker';
-import {FloatLabel} from 'primeng/floatlabel';
-import {Select} from 'primeng/select';
 import {Toolbar} from 'primeng/toolbar';
 import {FormsModule} from '@angular/forms';
 import {DatePipe} from '@angular/common';
@@ -13,15 +11,15 @@ import {Accordion, AccordionContent, AccordionHeader, AccordionPanel} from 'prim
 import {SortOverviewSchedulesPipe} from '../../pipes/sort-overview-schedules.pipe';
 import {SortOverviewScheduleUsersPipe} from '../../pipes/sort-overview-schedule-users.pipe';
 import {Tag} from 'primeng/tag';
-import {RouterLink} from '@angular/router';
+import {Router} from '@angular/router';
+import {ConfirmDialog} from 'primeng/confirmdialog';
+import {Toast} from 'primeng/toast';
 
 @Component({
   selector: 'app-assignments.overview',
   imports: [
     Button,
     DatePicker,
-    FloatLabel,
-    Select,
     Toolbar,
     FormsModule,
     DatePipe,
@@ -33,12 +31,13 @@ import {RouterLink} from '@angular/router';
     SortOverviewSchedulesPipe,
     SortOverviewScheduleUsersPipe,
     Tag,
-    RouterLink
+    ConfirmDialog,
+    Toast
   ],
   templateUrl: './assignments.overview.component.html',
   standalone: true,
   styleUrl: './assignments.overview.component.scss',
-  providers: [MessageService]
+  providers: [MessageService, ConfirmationService],
 })
 export class AssignmentsOverviewComponent implements OnInit {
   public rows = signal<any[]>([]);
@@ -47,6 +46,8 @@ export class AssignmentsOverviewComponent implements OnInit {
   constructor(
     private assignmentsService: AssignmentService,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
+    private router: Router,
   ) {
   }
   ngOnInit() {
@@ -89,5 +90,30 @@ export class AssignmentsOverviewComponent implements OnInit {
     this.assignmentsService.overview(this.rangeDates!).subscribe((data: any) => {
       this.rows.set(data.result);
     });
+  }
+
+  onProvider(ev: any, user: any) {
+    // console.log(user)
+    this.confirmationService.confirm({
+      target: ev.target as EventTarget,
+      message: 'View Details for ' + user._id.fName + ' ' + user._id.lName,
+      header: 'Confirmation',
+      closable: true,
+      closeOnEscape: true,
+      icon: 'pi pi-exclamation-triangle',
+      rejectButtonProps: {
+        label: 'Cancel',
+        severity: 'secondary'
+      },
+      acceptButtonProps: {
+        label: 'Yes',
+      },
+      accept: () => {
+        return this.router.navigate(['/', 'assignments', 'provider'], { queryParams: { provider: user._id.fName + '__' + user._id.lName } });
+      },
+      reject: () => {
+        // do nothing
+      },
+    })
   }
 }

@@ -1,3 +1,5 @@
+<p-confirm-dialog></p-confirm-dialog>
+<p-toast></p-toast>
 <p-toolbar>
   <ng-template #start>
     <h2 class="text-2xl">Assignments Overview</h2>
@@ -17,7 +19,7 @@
   </ng-template>
 </p-toolbar>
 @if (rows().length) {
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mt-4">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3 mt-4">
     @for (row of rows(); track row._id) {
       <p-card styleClass="p-2">
         <ng-template #header>
@@ -32,7 +34,7 @@
               <p-accordion-content>
                 <ul class="list-disc text-sm">
                   @for (user of tab.users | sortOverviewScheduleUsers; track user._id) {
-                    <li [routerLink]="['/', 'assignments', 'provider']"  [queryParams]="{provider: user._id.lName + '__' + user._id.fName}" class="cursor-pointer hover:bg-stone-100">
+                    <li (click)="onProvider($event, user)" class="cursor-pointer hover:bg-stone-100">
                       {{user._id.lName + ', ' + user._id.fName}}
                       @for (ass of user.assignments; track ass._id) {
                         <p-tag [value]="ass.aName"></p-tag>

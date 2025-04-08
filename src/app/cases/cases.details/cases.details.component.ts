@@ -10,7 +10,6 @@ import {Tag} from 'primeng/tag';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
 import {InputText} from 'primeng/inputtext';
-import {ScrollPanel} from 'primeng/scrollpanel';
 
 @Component({
   selector: 'app-cases-details',
@@ -25,8 +24,7 @@ import {ScrollPanel} from 'primeng/scrollpanel';
     Tag,
     IconField,
     InputIcon,
-    InputText,
-    ScrollPanel
+    InputText
   ],
   templateUrl: './cases.details.component.html',
   standalone: true,
@@ -40,7 +38,6 @@ export class CasesDetailsComponent implements OnInit {
   cols: any[] = [];
   downloadName = 'cases-details';
   selectedRow: any | undefined;
-  showRow = false;
   constructor(
     private episodeService: EpisodeService,
   ) {
@@ -57,7 +54,8 @@ export class CasesDetailsComponent implements OnInit {
   }
 
   onRowSelect($event: any) {
-    this.showRow = true;
+    // this.showRow = true;
+    this.episodeService.episodeRow = $event.data;
   }
 
   public drawerHeader = linkedSignal<string>(() => {

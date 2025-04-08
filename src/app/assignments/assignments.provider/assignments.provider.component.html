@@ -1,2 +1,91 @@
-<p>assignments.provider works!</p>
-{{providerParam}}
+<p-toast></p-toast>
+<p-toolbar>
+  <ng-template #start>
+    <h2 class="flex items-center text-2xl">
+      Provider's Assignments
+    </h2>
+  </ng-template>
+  <ng-template #end>
+    <p-select [options]="providersList()" [(ngModel)]="selectedProvider" optionLabel="searchable" [filter]="true" filterBy="searchable"
+              styleClass="me-2" [virtualScroll]="true" [virtualScrollItemSize]="38"
+              placeholder="Select Provider"></p-select>
+    <p-select [options]="dateRanges" [(ngModel)]="selectedDateRange" optionLabel="label" placeholder="Date Range" class="" />
+    <div [hidden]="customDates">
+      <p-floatlabel variant="on">
+        <p-datepicker class="ms-2"  inputId="custom_dates" showIcon iconDisplay="input"
+                      [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" [numberOfMonths]="2">
+
+        </p-datepicker>
+        <label>Custom Dates</label>
+      </p-floatlabel>
+    </div>
+    <p-button class="ms-2" icon="pi pi-refresh" label="Refresh" (onClick)="refresh()"></p-button>
+  </ng-template>
+</p-toolbar>
+@if (isLoading) {
+  <div class="card flex justify-center mt-4">
+    <p-progress-spinner [style]="{ width: '50px', height: '50px' }" />
+  </div>
+}
+@if (rows().length && !isLoading) {
+<!--  <p-panel styleClass="p-0 mt-4">-->
+<!--    <p-virtual-scroller [loading]="isLoading" [showLoader]="true" [style]="{ width: '100%', height: '70vh'}"-->
+<!--      [items]="rows()" [itemSize]="100" scrollHeight="70vh" [lazy]="true">-->
+<!--      <ng-template #item let-item let-options="options">-->
+
+<!--          <div style="height: 150px;" class="flex items-center p-2" [ngClass]="{ 'bg-surface-100 dark:bg-zinc-200': options.odd }" >-->
+<!--            {{item._id.date | date: 'shortDate'}}-->
+<!--            hello-->
+<!--          </div>-->
+
+<!--      </ng-template>-->
+<!--    </p-virtual-scroller>-->
+<!--  </p-panel>-->
+  <p-panel styleClass="mt-4">
+    <p-table [value]="rows()" [scrollable]="true" scrollHeight="60vh"
+             [virtualScroll]="true" [virtualScrollItemSize]="100"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Date</th>
+          <th>Assignments</th>
+          <th>Cases (episode : minutes)</th>
+          <th [style]="{'min-width': '200px'}">Concurrency</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-row>
+        <tr>
+          <td>{{row._id.date | date: 'shortDate'}}</td>
+          <td>
+            <ul>
+              @for (schedule of row.schedules; track schedule.schedule.id) {
+                <li>
+                  <small class="uppercase">{{schedule.schedule.name}}:</small>
+                  @for (ass of schedule.assignments; track ass._id) {
+                    <p-tag severity="info" [value]="ass.aName" styleClass="ms-2"></p-tag>
+                  }
+                </li>
+              }
+            </ul>
+          </td>
+          <td>
+            <ul>
+              @for (episode of row.episodes; track episode._id; let i = $index) {
+                <li class="list-disc py-1 : hover:bg-amber-100 cursor-pointer" (click)="onCase(episode)">
+                  <p-tag severity="warn" [value]="episode.cat1 + ' : ' + episode.episodeId"></p-tag> : <small class="">{{episode.anMinutes}}</small>
+                </li>
+              }
+            </ul>
+          </td>
+          <td>
+            @defer (on viewport) {
+              <app-assignments-small-concurrent [episodes]="row.episodes"></app-assignments-small-concurrent>
+            } @placeholder {
+              <div>Concurrency</div>
+            }
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-panel>
+}

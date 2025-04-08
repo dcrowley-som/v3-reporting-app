@@ -11,7 +11,8 @@ export class EpisodeService {
   private readonly apiUrl: string;
   private casesParamsSubject = new Subject<any>();
   casesParams$: Observable<any> = this.casesParamsSubject.asObservable();
-
+  private episodeRowSubject = new Subject<any>();
+  episodeRow$: Observable<any> = this.episodeRowSubject.asObservable();
   constructor(
     private http: HttpClient,
     private appService: AppService
@@ -21,6 +22,10 @@ export class EpisodeService {
 
   set casesParams(data: any) {
     this.casesParamsSubject.next(data);
+  }
+
+  set episodeRow(data: any) {
+    this.episodeRowSubject.next(data);
   }
 
   get topChartOptions() {

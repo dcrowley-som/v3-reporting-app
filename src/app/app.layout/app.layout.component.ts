@@ -11,6 +11,7 @@ import {EpisodeService} from '../services/episode.service';
 import {CasesDetailsComponent} from '../cases/cases.details/cases.details.component';
 import {CasesParams} from '../models/cases-params';
 import {AppService} from '../services/app.service';
+import {CasesEpisodeComponent} from '../cases/cases.episode/cases.episode.component';
 
 @Component({
   selector: 'app-app.layout',
@@ -24,7 +25,8 @@ import {AppService} from '../services/app.service';
     RouterLink,
     RouterOutlet,
     CasesDetailsComponent,
-    NgClass
+    NgClass,
+    CasesEpisodeComponent
   ],
   standalone: true,
   templateUrl: './app.layout.component.html',
@@ -34,6 +36,7 @@ export class AppLayoutComponent {
   showMenu = true;
   userMenuItems: MenuItem[] | undefined;
   detailsParams: CasesParams | undefined;
+  episodeRow: any | undefined;
   appVersion: string;
   constructor(
     private appService: AppService,
@@ -42,6 +45,9 @@ export class AppLayoutComponent {
     this.episodeService.casesParams$.subscribe((data: any) => {
       this.detailsParams = data;
     });
+    this.episodeService.episodeRow$.subscribe((data: any) => {
+      this.episodeRow = data;
+    })
     this.appVersion = this.appService.appVersion;
     this.userMenuItems = [
       {

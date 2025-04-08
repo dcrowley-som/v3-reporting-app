@@ -50,6 +50,9 @@
           <th pSortableColumn="episodeId">
             Episode <p-sortIcon field="episodeId"></p-sortIcon>
           </th>
+          <th pSortableColumn="service">
+            Service <p-sortIcon field="service"></p-sortIcon>
+          </th>
           <th pSortableColumn="procedure">
             Procedure <p-sortIcon field="procedure"></p-sortIcon>
           </th>
@@ -74,164 +77,12 @@
           <td>{{row.cat1}}</td>
           <td>{{row.episodeId}}</td>
           <td>{{row.procedure | slice: 0 :20}}</td>
-          <td>{{row.primaryPhysicianName}}</td>
+          <td>{{row.service}}</td>
+          <td>{{row.primaryPhysicianName}}</td>4
           <td>{{row.anMinutes | number}}</td>
           <td>{{row.inRoomMinutes | number}}</td>
         </tr>
       </ng-template>
     </p-table>
   </p-panel>
-</p-drawer>
-<p-drawer styleClass="!bg-zinc-200 !border-zinc-200 !text-zinc-600"
-          position="right" [(visible)]="showRow" header="Row Detail">
-  @if (selectedRow) {
-      <p-scroll-panel [style]="{ height: '80vh', width: '100%'}">
-        <div class="detail-item">
-          <div class="detail-label">
-            Date
-          </div>
-          <div class="detail-val">
-            {{selectedRow.date | date: 'shortDate'}}
-          </div>
-        </div>
-        <hr class="detail-line">
-        <div class="detail-item">
-          <div class="detail-label">
-            Category 1 &amp; 2
-          </div>
-          <div class="detail-val">
-            {{selectedRow.cat1}} | {{selectedRow.cat2}}
-          </div>
-        </div>
-        <hr />
-        <div class="detail-item">
-          <div class="detail-label">
-            Episode ID
-          </div>
-          <div class="detail-val">
-            {{selectedRow.episodeId}}
-          </div>
-        </div>
-        <hr />
-        <div class="detail-item">
-          <div class="detail-label">
-            Responsible Provider (Name | ID)
-          </div>
-          <div class="detail-val">
-            {{selectedRow.responsibleProvName}} ({{selectedRow.responsibleProvId}})
-          </div>
-        </div>
-        <hr />
-        <div class="detail-item">
-          <div class="detail-label">
-            Procedure
-          </div>
-          <div class="detail-val">
-            {{selectedRow.procedure}}
-          </div>
-        </div>
-        <hr />
-        <div class="detail-item">
-          <div class="detail-label">
-            Service
-          </div>
-          <div class="detail-val">
-            {{selectedRow.service}}
-          </div>
-        </div>
-        <hr />
-        <div class="detail-item">
-          <div class="detail-label">
-            Primary Physician (Name | ID)
-          </div>
-          <div class="detail-val">
-            {{selectedRow.primaryPhysicianName}} ({{selectedRow.primaryPhysicianId}})
-          </div>
-        </div>
-        <hr />
-        <div class="detail-item">
-          <div class="detail-label">
-            ANES start | stop
-          </div>
-          <div class="detail-val">
-            {{selectedRow.anesStart | date : 'short'}} | {{selectedRow.anesStop | date : 'short'}}
-          </div>
-        </div>
-        <hr />
-        <div class="detail-item">
-          <div class="detail-label">
-            Minutes (AN | In Room)
-          </div>
-          <div class="detail-val">
-            {{selectedRow.anMinutes}} | {{selectedRow.inRoomMinutes}}
-          </div>
-        </div>
-        <hr />
-        <div class="detail-item">
-          <div class="detail-label">
-            Surgery Date
-          </div>
-          <div class="detail-val">
-            {{selectedRow.surgeryDate | date: 'shortDate'}}
-          </div>
-        </div>
-        <hr />
-        <div class="detail-item">
-          <div class="detail-label">
-            Out OR Date
-          </div>
-          <div class="detail-val">
-            {{selectedRow.outORDate | date: 'shortDate'}}
-          </div>
-        </div>
-        <hr />
-        <div class="detail-item">
-          <div class="detail-label">
-            Encounter Closed (Y/N | Date)
-          </div>
-          <div class="detail-val">
-            {{selectedRow.encounterClosed}} | {{selectedRow.encounterClosedDate | date: 'shortDate'}}
-          </div>
-        </div>
-        <hr />
-        <div class="detail-item">
-          <div class="detail-label">
-            MRN
-          </div>
-          <div class="detail-val">
-            {{selectedRow.mrn}}
-          </div>
-        </div>
-        <hr />
-        <div class="detail-item">
-          <div class="detail-label">
-            Patient (DOB, Age)
-          </div>
-          <div class="detail-val">
-            {{selectedRow.birthDate | date: 'shortDate'}} ({{selectedRow.age}})
-          </div>
-        </div>
-        <hr />
-        <div class="detail-item">
-          <div class="detail-label">
-            Location (Name | ID)
-          </div>
-          <div class="detail-val">
-            {{selectedRow.locationName}} ({{selectedRow.locationId}})
-          </div>
-        </div>
-        <hr />
-        <div class="detail-item">
-          <div class="detail-label">
-            OR Location &amp; Room
-          </div>
-          <div class="detail-val">
-            {{selectedRow.orLocation}} | {{selectedRow.room}}
-          </div>
-        </div>
-        <hr />
-
-
-      </p-scroll-panel>
-  }
 </p-drawer>

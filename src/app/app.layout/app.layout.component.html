@@ -59,39 +59,46 @@
                 <span class="font-medium">Concurrency</span>
               </a>
             </li>
+            <li>
+              <a pRipple [routerLink]="['/', 'assignments', 'daily-snapshot']"
+                 class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">
+                <i class="pi pi-camera mr-2"></i>
+                <span class="font-medium">Daily Snapshot</span>
+              </a>
+            </li>
           </ul>
         </li>
         <!-- Billing -->
-        <li>
-          <div
-            pRipple
-            pStyleClass="@next"
-            enterFromClass="hidden"
-            enterActiveClass="animate-slidedown"
-            leaveToClass="hidden"
-            leaveActiveClass="animate-slideup"
-            class="p-4 flex items-center justify-between cursor-pointer p-ripple text-sky-300"
-          >
-            <span class="font-medium uppercase">Billing</span>
-            <i class="pi pi-chevron-down"></i>
-          </div>
-          <ul class="list-none p-0 m-0 overflow-hidden">
-            <li>
-              <a pRipple [routerLink]="['/', 'billing', 'unmatched']"
-                 class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">
-                <i class="pi pi-wave-pulse mr-2"></i>
-                <span class="font-medium">Unmatched Cases</span>
-              </a>
-            </li>
-            <li>
-              <a pRipple [routerLink]="['/', 'cases']"
-                 class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">
-                <i class="pi pi-exclamation-triangle mr-2"></i>
-                <span class="font-medium">Deficiencies</span>
-              </a>
-            </li>
-          </ul>
-        </li>
+<!--        <li>-->
+<!--          <div-->
+<!--            pRipple-->
+<!--            pStyleClass="@next"-->
+<!--            enterFromClass="hidden"-->
+<!--            enterActiveClass="animate-slidedown"-->
+<!--            leaveToClass="hidden"-->
+<!--            leaveActiveClass="animate-slideup"-->
+<!--            class="p-4 flex items-center justify-between cursor-pointer p-ripple text-sky-300"-->
+<!--          >-->
+<!--            <span class="font-medium uppercase">Billing</span>-->
+<!--            <i class="pi pi-chevron-down"></i>-->
+<!--          </div>-->
+<!--          <ul class="list-none p-0 m-0 overflow-hidden">-->
+<!--            <li>-->
+<!--              <a pRipple [routerLink]="['/', 'billing', 'unmatched']"-->
+<!--                 class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">-->
+<!--                <i class="pi pi-wave-pulse mr-2"></i>-->
+<!--                <span class="font-medium">Unmatched Cases</span>-->
+<!--              </a>-->
+<!--            </li>-->
+<!--            <li>-->
+<!--              <a pRipple [routerLink]="['/', 'cases']"-->
+<!--                 class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">-->
+<!--                <i class="pi pi-exclamation-triangle mr-2"></i>-->
+<!--                <span class="font-medium">Deficiencies</span>-->
+<!--              </a>-->
+<!--            </li>-->
+<!--          </ul>-->
+<!--        </li>-->
         <!-- Cases -->
         <li>
           <div
@@ -115,6 +122,13 @@
               </a>
             </li>
             <li>
+              <a pRipple [routerLink]="['/', 'cases', 'count']"
+                 class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">
+                <i class="pi pi-calculator mr-2"></i>
+                <span class="font-medium">Counts</span>
+              </a>
+            </li>
+            <li>
               <a pRipple [routerLink]="['/', 'cases', 'monthly']"
                  class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">
                 <i class="pi pi-calendar mr-2"></i>
@@ -131,36 +145,36 @@
           </ul>
         </li>
         <!-- Quality -->
-        <li>
-          <div
-            pRipple
-            pStyleClass="@next"
-            enterFromClass="hidden"
-            enterActiveClass="animate-slidedown"
-            leaveToClass="hidden"
-            leaveActiveClass="animate-slideup"
-            class="p-4 flex items-center justify-between cursor-pointer p-ripple text-sky-300"
-          >
-            <span class="font-medium uppercase">Quality</span>
-            <i class="pi pi-chevron-down"></i>
-          </div>
-          <ul class="list-none p-0 m-0 overflow-hidden">
-            <li>
-              <a pRipple [routerLink]="['/', 'cases']"
-                 class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">
-                <i class="pi pi-verified mr-2"></i>
-                <span class="font-medium">JPP &amp; Quality</span>
-              </a>
-            </li>
-            <li>
-              <a pRipple [routerLink]="['/', 'cases']"
-                 class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">
-                <i class="pi pi-check-square mr-2"></i>
-                <span class="font-medium">Pre-op Signature</span>
-              </a>
-            </li>
-          </ul>
-        </li>
+<!--        <li>-->
+<!--          <div-->
+<!--            pRipple-->
+<!--            pStyleClass="@next"-->
+<!--            enterFromClass="hidden"-->
+<!--            enterActiveClass="animate-slidedown"-->
+<!--            leaveToClass="hidden"-->
+<!--            leaveActiveClass="animate-slideup"-->
+<!--            class="p-4 flex items-center justify-between cursor-pointer p-ripple text-sky-300"-->
+<!--          >-->
+<!--            <span class="font-medium uppercase">Quality</span>-->
+<!--            <i class="pi pi-chevron-down"></i>-->
+<!--          </div>-->
+<!--          <ul class="list-none p-0 m-0 overflow-hidden">-->
+<!--            <li>-->
+<!--              <a pRipple [routerLink]="['/', 'cases']"-->
+<!--                 class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">-->
+<!--                <i class="pi pi-verified mr-2"></i>-->
+<!--                <span class="font-medium">JPP &amp; Quality</span>-->
+<!--              </a>-->
+<!--            </li>-->
+<!--            <li>-->
+<!--              <a pRipple [routerLink]="['/', 'cases']"-->
+<!--                 class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">-->
+<!--                <i class="pi pi-check-square mr-2"></i>-->
+<!--                <span class="font-medium">Pre-op Signature</span>-->
+<!--              </a>-->
+<!--            </li>-->
+<!--          </ul>-->
+<!--        </li>-->
       </ul>
     </div>
   </p-drawer>

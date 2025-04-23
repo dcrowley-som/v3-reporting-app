@@ -3,6 +3,8 @@ import {HttpClient} from '@angular/common/http';
 import {AppService} from './app.service';
 import {EpisodeOverviewResult} from '../models/episode-overview';
 import {Observable, Subject} from 'rxjs';
+import {EpisodeCountResult} from '../models/episode-count';
+import {EpisodeMonthlyResult, EpisodeTable} from '../models/episode-monthly';
 
 @Injectable({
   providedIn: 'root'
@@ -90,14 +92,24 @@ export class EpisodeService {
     ];
   }
 
-  overview(selectedRange: string, dates: Date[] | undefined, groupBy: string) {
+  count(selectedRange: string, dates: Date[] | undefined, groupBy: string) {
     let start = null;
     let end = null;
     if (dates) {
       start = dates[0];
       end = dates[1];
     }
-      return this.http.post<EpisodeOverviewResult>(this.apiUrl + 'reporting/episodes/overview', {selectedRange, start, end, groupBy}, this.appService.basicHeaders);
+      return this.http.post<EpisodeCountResult>(this.apiUrl + 'reporting/episodes/count', {selectedRange, start, end, groupBy}, this.appService.basicHeaders);
+  }
+
+  overview(selectedRange: string, categories: string[], dates: Date[] | undefined) {
+    let start = null;
+    let end = null;
+    if (dates) {
+      start = dates[0];
+      end = dates[1];
+    }
+    return this.http.post<EpisodeOverviewResult>(this.apiUrl + 'reporting/episodes/monthly', {selectedRange, categories: { list: categories}, start, end}, this.appService.basicHeaders);
   }
 
   monthly(selectedRange: string, categories: string[], dates: Date[] | undefined) {
@@ -107,7 +119,7 @@ export class EpisodeService {
       start = dates[0];
       end = dates[1];
     }
-    return this.http.post<EpisodeOverviewResult>(this.apiUrl + 'reporting/episodes/monthly', {selectedRange, categories: { list: categories}, start, end}, this.appService.basicHeaders);
+    return this.http.post<EpisodeMonthlyResult>(this.apiUrl + 'reporting/episodes/monthly', {selectedRange, categories: { list: categories}, start, end}, this.appService.basicHeaders);
   }
 
   provider(selectedRange: string, categories: string[],  user: string, dates: Date[] | undefined) {
@@ -137,7 +149,7 @@ export class EpisodeService {
       start = dates[0];
       end = dates[1];
     }
-    return this.http.post<EpisodeOverviewResult>(this.apiUrl + 'reporting/episodes/table', {selectedRange, categories: { list: categories}, start, end}, this.appService.basicHeaders);
+    return this.http.post<EpisodeTable>(this.apiUrl + 'reporting/episodes/table', {selectedRange, categories: { list: categories}, start, end}, this.appService.basicHeaders);
   }
 
   selectLists() {

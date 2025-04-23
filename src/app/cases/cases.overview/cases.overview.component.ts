@@ -6,439 +6,225 @@ import {FormsModule} from '@angular/forms';
 import {DatePicker} from 'primeng/datepicker';
 import {FloatLabel} from 'primeng/floatlabel';
 import {Button} from 'primeng/button';
-import {EpisodeService} from '../../services/episode.service';
 import {Card} from 'primeng/card';
-import {EpisodeOverview, EpisodeOverviewCategory} from '../../models/episode-overview';
-import {DecimalPipe} from '@angular/common';
+import {DecimalPipe, NgClass, NgForOf} from '@angular/common';
 import {Toast} from 'primeng/toast';
 import {UIChart} from 'primeng/chart';
-import {forkJoin, map} from 'rxjs';
+import {finalize, forkJoin, map} from 'rxjs';
 import {ConfirmDialog} from 'primeng/confirmdialog';
 import {Router} from '@angular/router';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {EpisodeService} from '../../services/episode.service';
+import {EpisodeMonthly, EpisodeTable} from '../../models/episode-monthly';
+import {MultiSelect} from 'primeng/multiselect';
+import {RadioButton} from 'primeng/radiobutton';
+import {EpisodeMonthlyColumnPipe} from '../../pipes/episode-monthly-column.pipe';
+import {Panel} from 'primeng/panel';
+import {TableModule} from 'primeng/table';
 
 @Component({
   selector: 'app-cases.overview',
   imports: [Toolbar, Select, FormsModule, DatePicker, FloatLabel, Button, Card, DecimalPipe, Toast, UIChart,
-  ConfirmDialog],
+    ConfirmDialog, ProgressSpinner, MultiSelect, RadioButton, EpisodeMonthlyColumnPipe, NgForOf, Panel, TableModule, NgClass],
   templateUrl: './cases.overview.component.html',
   standalone: true,
   styleUrl: './cases.overview.component.scss',
   providers: [MessageService, ConfirmationService]
 })
 export class CasesOverviewComponent implements OnInit {
-  @ViewChild(UIChart) categoriesChart: UIChart | undefined;
-  dateRanges: MenuItem[] | undefined;
-  selectedDateRange: MenuItem | undefined;
-  rangeDates: Date[] | undefined;
-  sortCols: any[] = [{
-    id: 'episodes', label: 'Cases'
-  }, {
-    id: 'anMinutes', label: 'AN Minutes',
-  }, {
-    id: 'inRoomMinutes', label: "In Room Minutes"
-  }];
-  public sortCol = signal<any>(this.sortCols[0]);
-  public sortColServices = signal<any>(this.sortCols[0]);
-  public sortColProcedures = signal<any>(this.sortCols[0]);
-  public sortColProviders = signal<any>(this.sortCols[0]);
-  public result = signal<EpisodeOverview>({
-    _id: 'all',
-    anMinutes: 0,
-    inRoomMinutes: 0,
-    episodes: 0,
-    categories: []
-  });
-  public servicesResult = signal<EpisodeOverview>({
-    _id: 'all',
-    anMinutes: 0,
-    inRoomMinutes: 0,
-    episodes: 0,
-    categories: []
-  });
-  public providersResult = signal<EpisodeOverview>({
-    _id: 'all',
-    anMinutes: 0,
-    inRoomMinutes: 0,
-    episodes: 0,
-    categories: []
-  });
-  public proceduresResult = signal<EpisodeOverview>({
-    _id: 'all',
-    anMinutes: 0,
-    inRoomMinutes: 0,
-    episodes: 0,
-    categories: []
-  });
-  // Categories
-  public categories = linkedSignal<EpisodeOverviewCategory[]>(() => {
-    return this.result().categories;
-  });
-  public categoryChartData = linkedSignal(() => {
-    return {
-      labels: this.categories()
-        .sort((a: any, b: any) => {
-          const aNum = a[this.sortCol().id];
-          const bNum = b[this.sortCol().id];
-          return bNum - aNum;
-        })
-        .map(cat => cat._id),
-      datasets: [
-        {
-          label: "Cases",
-          backgroundColor: 'rgba(14, 165, 233, .8)',
-          borderColor: 'rgb(14, 165, 233)',
-          data: this.categories()
-            .sort((a: any, b: any) => {
-              const aNum = a[this.sortCol().id];
-              const bNum = b[this.sortCol().id];
-              return bNum - aNum;
-            })
-            .map(cat => cat.episodes),
-          hidden: this.sortCol().id !== 'episodes'
-        },
-        {
-          label: "AN Minutes",
-          backgroundColor: 'rgba(20, 184, 166, .8)',
-          borderColor: 'rgb(20, 184, 166)',
-          data: this.categories()
-            .sort((a: any, b: any) => {
-              const aNum = a[this.sortCol().id];
-              const bNum = b[this.sortCol().id];
-              return bNum - aNum;
-            })
-            .map(cat => cat.anMinutes),
-          hidden: this.sortCol().id !== 'anMinutes'
-        },
-        {
-          label: "In Room Minutes",
-          backgroundColor: 'rgba(99, 102, 241, .8)',
-          borderColor: 'rgb(0,0,0)',
-          data: this.categories()
-            .sort((a: any, b: any) => {
-              const aNum = a[this.sortCol().id];
-              const bNum = b[this.sortCol().id];
-              return bNum - aNum;
-            })
-            .map(cat => cat.inRoomMinutes),
-          hidden: this.sortCol().id !== 'inRoomMinutes'
-        }
-      ]
+  public isLoading = false;
+  public selectedCategories: any[] = [];
+  public selectedMetric = signal<string>('episodes');
+  topChartOptions: any;
+  public categories = signal<any[]>([]);
+  public fyResults = signal<EpisodeMonthly[]>([]);
+  public prevFYResults = signal<EpisodeMonthly[]>([]);
+  public rollingResults = signal<EpisodeMonthly[]>([]);
+  public prevRollingResults = signal<EpisodeMonthly[]>([]);
+  public tableFyResults = signal<EpisodeTable[]>([]);
+  public tablePrevFyResults = signal<EpisodeTable[]>([]);
+  public tableRollingResults = signal<EpisodeTable[]>([]);
+  public tablePrevRollingResults = signal<EpisodeTable[]>([]);
+  public totals = signal<any>({
+    fy: {
+      episodes: 0,
+      anMinutes: 0,
+      inRoomMinutes: 0,
+    },
+    prevFy: {
+      episodes: 0,
+      anMinutes: 0,
+      inRoomMinutes: 0,
+    },
+    rolling: {
+      episodes: 0,
+      anMinutes: 0,
+      inRoomMinutes: 0,
+    },
+    prevRolling: {
+      episodes: 0,
+      anMinutes: 0,
+      inRoomMinutes: 0,
     }
   });
-  public categoryChartOptions =  {
-      indexAxis: 'y',
-      maintainAspectRatio: false,
-      aspectRatio: 0.8,
-      plugins: {
-        legend: {
-          labels: {
-            color: 'grey',
-            font: {
-              weight: 300
-            }
-          }
-        }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: 'grey',
-            font: {
-              weight: 400,
-              size: 9
-            }
-          },
-          grid: {
-            color: 'lightgray',
-            drawBorder: false
-          }
-        },
-        y: {
-          ticks: {
-            color: 'grey',
-            font: {
-              weight: 400,
-              size: 9
-            }
-          },
-          grid: {
-            color: 'rgba(0,0,0,0)',
-            drawBorder: false
-          }
-        }
-      }
-  };
-  public services = linkedSignal<EpisodeOverviewCategory[]>(() => {
-    return this.servicesResult().categories;
-  });
-  public servicesChartData = linkedSignal(() => {
-    return {
-      labels: this.services()
-        .sort((a: any, b: any) => {
-          const aNum = a[this.sortColServices().id];
-          const bNum = b[this.sortColServices().id];
-          return bNum - aNum;
-        })
-        .slice(0,10).map(cat => cat._id),
-      datasets: [
-        {
-          label: "Cases",
-          backgroundColor: 'rgba(14, 165, 233, .8)',
-          borderColor: 'rgb(14, 165, 233)',
-          data: this.services()
-            .sort((a: any, b: any) => {
-              const aNum = a[this.sortColServices().id];
-              const bNum = b[this.sortColServices().id];
-              return bNum - aNum;
-            })
-            .map(cat => cat.episodes),
-          hidden: this.sortColServices().id !== 'episodes'
-        },
-        {
-          label: "AN Minutes",
-          backgroundColor: 'rgba(20, 184, 166, .8)',
-          borderColor: 'rgb(20, 184, 166)',
-          data: this.services()
-            .sort((a: any, b: any) => {
-              const aNum = a[this.sortColServices().id];
-              const bNum = b[this.sortColServices().id];
-              return bNum - aNum;
-            })
-            .map(cat => cat.anMinutes),
-          hidden: this.sortColServices().id !== 'anMinutes'
-        },
-        {
-          label: "In Room Minutes",
-          backgroundColor: 'rgba(99, 102, 241, .8)',
-          borderColor: 'rgb(0,0,0)',
-          data: this.services()
-            .sort((a: any, b: any) => {
-              const aNum = a[this.sortColServices().id];
-              const bNum = b[this.sortColServices().id];
-              return bNum - aNum;
-            })
-            .map(cat => cat.inRoomMinutes),
-          hidden: this.sortColServices().id !== 'inRoomMinutes'
-        }
-      ]
-    }
-  });
-  public providers = linkedSignal<EpisodeOverviewCategory[]>(() => {
-    return this.providersResult().categories;
-  });
-  public providersChartData = linkedSignal(() => {
-    return {
-      labels: this.providers()
-        .sort((a: any, b: any) => {
-          const aNum = a[this.sortColProviders().id];
-          const bNum = b[this.sortColProviders().id];
-          return bNum - aNum;
-        })
-        .map(cat => cat._id),
-      datasets: [
-        {
-          label: "Cases",
-          backgroundColor: 'rgba(14, 165, 233, .8)',
-          borderColor: 'rgb(14, 165, 233)',
-          data: this.providers()
-            .sort((a: any, b: any) => {
-              const aNum = a[this.sortColProviders().id];
-              const bNum = b[this.sortColProviders().id];
-              return bNum - aNum;
-            })
-            .map(cat => cat.episodes),
-          hidden: this.sortColProviders().id !== 'episodes',
-        },
-        {
-          label: "AN Minutes",
-          backgroundColor: 'rgba(20, 184, 166, .8)',
-          borderColor: 'rgb(20, 184, 166)',
-          data: this.providers()
-            .sort((a: any, b: any) => {
-              const aNum = a[this.sortColProviders().id];
-              const bNum = b[this.sortColProviders().id];
-              return bNum - aNum;
-            })
-            .map(cat => cat.anMinutes),
-          hidden: this.sortColProviders().id !== 'anMinutes',
-        },
-        {
-          label: "In Room Minutes",
-          backgroundColor: 'rgba(99, 102, 241, .8)',
-          borderColor: 'rgb(0,0,0)',
-          data: this.providers()
-            .sort((a: any, b: any) => {
-              const aNum = a[this.sortColProviders().id];
-              const bNum = b[this.sortColProviders().id];
-              return bNum - aNum;
-            })
-            .map(cat => cat.inRoomMinutes),
-          hidden: this.sortColProviders().id !== 'inRoomMinutes',
-        }
-      ]
-    }
-  });
-  public procedures = linkedSignal<EpisodeOverviewCategory[]>(() => {
-    return this.proceduresResult().categories;
-  });
-  public proceduresChartData = linkedSignal(() => {
-    return {
-      labels: this.procedures()
-        .sort((a: any, b: any) => {
-          const aNum = a[this.sortColProcedures().id];
-          const bNum = b[this.sortColProcedures().id];
-          return bNum - aNum;
-        })
-        .slice(0,10).map(cat => cat._id.slice(0,20)),
-      datasets: [
-        {
-          label: "Cases",
-          backgroundColor: 'rgba(14, 165, 233, .8)',
-          borderColor: 'rgb(14, 165, 233)',
-          data: this.procedures()
-            .sort((a: any, b: any) => {
-              const aNum = a[this.sortColProcedures().id];
-              const bNum = b[this.sortColProcedures().id];
-              return bNum - aNum;
-            }).slice(0,10).map(cat => cat.episodes),
-          hidden: this.sortColProcedures().id !== 'episodes',
-        },
-        {
-          label: "AN Minutes",
-          backgroundColor: 'rgba(20, 184, 166, .8)',
-          borderColor: 'rgb(20, 184, 166)',
-          data: this.procedures()
-            .sort((a: any, b: any) => {
-              const aNum = a[this.sortColProcedures().id];
-              const bNum = b[this.sortColProcedures().id];
-              return bNum - aNum;
-            })
-            .slice(0,10).map(cat => cat.anMinutes),
-          hidden: this.sortColProcedures().id !== 'anMinutes',
-        },
-        {
-          label: "In Room Minutes",
-          backgroundColor: 'rgba(99, 102, 241, .8)',
-          borderColor: 'rgb(0,0,0)',
-          data: this.procedures()
-            .sort((a: any, b: any) => {
-              const aNum = a[this.sortColProcedures().id];
-              const bNum = b[this.sortColProcedures().id];
-              return bNum - aNum;
-            })
-            .slice(0,10)
-            .map(cat => cat.inRoomMinutes),
-          hidden: this.sortColProcedures().id !== 'inRoomMinutes',
-        }
-      ]
-    }
-  });
+
   constructor(
     private episodeService: EpisodeService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
-    private router: Router
   ) {
+    this.topChartOptions = episodeService.topChartOptions;
   }
 
-  ngOnInit(): void {
-    this.dateRanges = this.episodeService.dateRanges;
-    this.selectedDateRange = this.dateRanges[0];
-    this.refresh();
-  }
-
-  get customDates():boolean {
-    return !(this.selectedDateRange && this.selectedDateRange.label === 'Custom');
-  }
-
-  refresh() {
-    if (!this.selectedDateRange) {
-      this.messageService.add({ severity: 'warn', summary: 'Missing Parameters', detail: 'Please select a date range.' });
-      return;
-    }
-    if (this.selectedDateRange!.label === 'Custom' && (
-      !this.rangeDates || this.rangeDates.length < 2 || this.rangeDates[0] === null || this.rangeDates[1] === null
-    )) {
-      this.messageService.add({ severity: 'warn', summary: 'Missing Parameters', detail: 'Custom date ranges require start and end dates.' });
-      return;
-    }
-    this.episodeService.overview(this.selectedDateRange!.label as string, this.rangeDates, 'cat1')
-      .subscribe((data: any) => {
-        this.result.set(data.result);
-        this.refreshAll();
-      });
-  }
-
-  private refreshAll() {
-    const sources = [
-      this.episodeService.overview(this.selectedDateRange!.label as string, this.rangeDates, 'service'),
-      this.episodeService.overview(this.selectedDateRange!.label as string, this.rangeDates, 'responsibleProvName'),
-      this.episodeService.overview(this.selectedDateRange!.label as string, this.rangeDates, 'procedure'),
-    ];
-
-    forkJoin(sources)
-      .pipe(map(([_services, _providers, _procedures]) => {
-        return {
-          _services: _services,
-          _providers: _providers,
-          _procedures: _procedures
-        }
-      }))
-      .subscribe((allSources: any) => {
-        this.servicesResult.set(allSources._services.result);
-        this.providersResult.set(allSources._providers.result);
-        this.proceduresResult.set(allSources._procedures.result);
-      });
-  }
-
-  onProvidersChart(ev: any) {
-    const catStr = this.providers()[ev.element.index]._id;
-    this.confirmationService.confirm({
-      target: ev.target as EventTarget,
-      message: 'View Details for ' + catStr,
-      header: 'Confirmation',
-      closable: true,
-      closeOnEscape: true,
-      icon: 'pi pi-exclamation-triangle',
-      rejectButtonProps: {
-        label: 'Cancel',
-        severity: 'secondary'
-      },
-      acceptButtonProps: {
-        label: 'Yes',
-      },
-      accept: () => {
-        return this.router.navigate(['/', 'cases', 'provider'], { queryParams: { provider: catStr } });
-      },
-      reject: () => {
-        // do nothing
-      },
-    });
-  }
-
-  onCategoriesChart(ev: any) {
-    const catStr = this.categories()[ev.element.index]._id;
-    this.confirmationService.confirm({
-      target: ev.target as EventTarget,
-      message: 'View Details for ' + catStr,
-      header: 'Confirmation',
-      closable: true,
-      closeOnEscape: true,
-      icon: 'pi pi-exclamation-triangle',
-      rejectButtonProps: {
-        label: 'Cancel',
-        severity: 'secondary'
-      },
-      acceptButtonProps: {
-        label: 'Yes',
-      },
-      accept: () => {
-        return this.router.navigate(['/', 'cases', 'monthly'], { queryParams: { cat1: catStr } });
-      },
-      reject: () => {
-        // do nothing
-      },
+  ngOnInit() {
+    this.isLoading = true;
+    this.episodeService.selectLists().subscribe((data: any) => {
+      this.categories.set(data.cat1.map((row: any) => {
+        return { label: row };
+      }));
+      this.selectedCategories = this.categories().slice();
+      this.refresh();
     })
   }
 
+  public tableData = linkedSignal(() => {
+    // if (!this.tableFyResults()) {
+    //   return [];
+    // }
+    const ret: any[] = [];
+    for (const [i, v] of this.tableFyResults().entries()) {
+      const cat = v._id.category;
+      ret.push({
+        category: cat,
+        fy: this.tableFyResults()[i],
+        prevFy: this.tablePrevFyResults()[i],
+        rolling: this.tableRollingResults()[i],
+        prevRolling: this.tablePrevRollingResults()[i]
+      });
+    }
+    return ret;
+  });
+
+  public diffClass(prev: any, curr: any): string {
+    const p = prev[this.selectedMetric()];
+    const c = curr[this.selectedMetric()];
+    if (c > p) {
+      return '!bg-green-200';
+    } else if (p > c) {
+      return '!bg-red-200';
+    } else {
+      return '';
+    }
+  }
+
+  private chartData(results: any[], prev: any[], dateLabel: string, metric: string, r: number, g: number, b: number): any {
+    return {
+      labels: results
+        .map(row => row._id.month + '/' + row._id.year),
+      datasets: [
+        {
+          label: dateLabel,
+          backgroundColor: 'rgb(' + r + ',' + g + ',' + b + ', 0.8)',
+          borderColor: 'rgb(' + r + ',' + g + ',' + b + ')',
+          data: results
+            .map((row: any) => row[metric]),
+          fill: false,
+          tension: 0.4
+        },
+        {
+          label: 'Previous',
+          backgroundColor: 'rgba(254, 154, 0, .8)',
+          borderColor: 'rgba(254, 154, 0)',
+          data: prev
+            .map((row:any) => row[metric]),
+          fill: false,
+          tension: 0.4
+        }
+      ]
+    }
+  }
+
+  public topFyData = linkedSignal(() => {
+    return this.chartData(this.fyResults(), this.prevFYResults(), 'FY-TD', this.selectedMetric(), 14, 165, 233);
+  });
+
+  public topRollingData = linkedSignal(() => {
+    return this.chartData(this.rollingResults(), this.prevRollingResults(), 'Rolling-12', this.selectedMetric(), 14, 165, 233);
+  });
+
+  public refresh() {
+    const catStr = this.selectedCategories.map((row: any) => {
+      return row.label;
+    });
+    const sources = [
+      this.episodeService.overview('FY-YTD', catStr, undefined),
+      this.episodeService.overview('PREV-FY-YTD', catStr, undefined),
+      this.episodeService.overview('ROLLING-12', catStr, undefined),
+      this.episodeService.overview('PREV-ROLLING-12', catStr, undefined),
+      this.episodeService.table('FY-YTD', catStr, undefined),
+      this.episodeService.table('PREV-FY-YTD', catStr, undefined),
+      this.episodeService.table('ROLLING-12', catStr, undefined),
+      this.episodeService.table('PREV-ROLLING-12', catStr, undefined)
+    ];
+    this.isLoading = true;
+    forkJoin(sources)
+      .pipe(map(([_fy, _prevFy, _rolling, _prevRolling, _tableFy, _tablePrevFy, _tableRolling, _tablePrevRolling]) => {
+        return {
+          _fy, _prevFy, _rolling, _prevRolling, _tableFy, _tablePrevFy, _tableRolling, _tablePrevRolling
+        }
+      }))
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe((all: any) => {
+        console.log(all);
+        const t = {
+          fy: {
+            episodes: 0,
+            anMinutes: 0,
+            inRoomMinutes: 0,
+          },
+          prevFy: {
+            episodes: 0,
+            anMinutes: 0,
+            inRoomMinutes: 0,
+          },
+          rolling: {
+            episodes: 0,
+            anMinutes: 0,
+            inRoomMinutes: 0,
+          },
+          prevRolling: {
+            episodes: 0,
+            anMinutes: 0,
+            inRoomMinutes: 0,
+          },
+        };
+        for (const row of all._fy.result) {
+          t.fy.episodes += row.episodes;
+          t.fy.anMinutes += row.anMinutes;
+          t.fy.inRoomMinutes += row.inRoomMinutes;
+        }
+        for (const row of all._prevFy.result) {
+          t.prevFy.episodes += row.episodes;
+          t.prevFy.anMinutes += row.anMinutes;
+          t.prevFy.inRoomMinutes += row.inRoomMinutes;
+        }
+        for (const row of all._rolling.result) {
+          t.rolling.episodes += row.episodes;
+          t.rolling.anMinutes += row.anMinutes;
+          t.rolling.inRoomMinutes += row.inRoomMinutes;
+        }
+        for (const row of all._prevRolling.result) {
+          t.prevRolling.episodes += row.episodes;
+          t.prevRolling.anMinutes += row.anMinutes;
+          t.prevRolling.inRoomMinutes += row.inRoomMinutes;
+        }
+        this.totals.set(t);
+        this.fyResults.set(all._fy.result);
+        this.prevFYResults.set(all._prevFy.result);
+        this.rollingResults.set(all._rolling.result);
+        this.prevRollingResults.set(all._prevRolling.result);
+        this.tableFyResults.set(all._tableFy.result);
+        this.tablePrevFyResults.set(all._tablePrevFy.result);
+        this.tableRollingResults.set(all._tableRolling.result);
+        this.tablePrevRollingResults.set(all._tablePrevRolling.result);
+      });
+  }
 }

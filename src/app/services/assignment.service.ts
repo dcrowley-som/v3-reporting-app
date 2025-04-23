@@ -47,4 +47,8 @@ export class AssignmentService {
     }
     return this.http.post(this.apiUrl + 'reporting/assignments/concurrency', {selectedRange: range, start, end, user: provider, assignment}, this.appService.basicHeaders);
   }
+
+  dailySnapshot(providers: string[], date: Date) {
+    return this.http.post(this.apiUrl + 'reporting/assignments/daily-snapshot', {providers: {list: providers}, date}, this.appService.basicHeaders);
+  }
 }

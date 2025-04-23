@@ -1,0 +1,42 @@
+<p-toast></p-toast>
+<p-toolbar>
+  <ng-template #start>
+    <h2 class="flex items-center text-2xl">
+      Daily Snapshot
+    </h2>
+  </ng-template>
+  <ng-template #end>
+    <div>
+      <p-floatlabel variant="on">
+        <p-datepicker class="ms-2"  inputId="custom_dates" showIcon iconDisplay="input"
+                      [(ngModel)]="rangeDate" [readonlyInput]="true">
+
+        </p-datepicker>
+        <label>Select Date</label>
+      </p-floatlabel>
+    </div>
+    <p-button class="ms-2" icon="pi pi-refresh" label="Refresh" (onClick)="refresh()"></p-button>
+  </ng-template>
+</p-toolbar>
+@if (isLoading) {
+  <div class="card flex justify-center mt-4">
+    <p-progress-spinner [style]="{ width: '50px', height: '50px' }" />
+  </div>
+}
+<div class="mt-4">
+  <p-pickList
+    [showSourceControls]="false"
+    [showTargetControls]="false"
+    [source]="providersList()"
+    [target]="selectedProviders"
+    filterBy="searchable"
+    [dragdrop]="true"
+    [responsive]="true"
+    sourceFilterPlaceholder="Search by name"
+    targetFilterPlaceholder="Search by name"
+  >
+    <ng-template let-item #item>
+      {{ item.searchable }}
+    </ng-template>
+  </p-pickList>
+</div>

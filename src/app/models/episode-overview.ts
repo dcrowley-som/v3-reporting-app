@@ -1,12 +1,15 @@
 export interface EpisodeOverviewCategory {
-  _id: string;
+  category: string;
   anMinutes: number;
   inRoomMinutes: number;
   episodes: number;
 }
 
 export interface EpisodeOverview {
-  _id: string;
+  _id: {
+    year: number;
+    month: number;
+  };
   anMinutes: number;
   inRoomMinutes: number;
   episodes: number;
@@ -14,5 +17,25 @@ export interface EpisodeOverview {
 }
 
 export interface EpisodeOverviewResult {
-  result: EpisodeOverview;
+  result: EpisodeOverview[];
+}
+
+export interface EpisodeTableMonth {
+  year: number,
+  month: number
+  anMinutes: number;
+  inRoomMinutes: number;
+  episodes: number;
+}
+
+export interface EpisodeOverviewTable {
+  _id: {
+    category: string,
+  };
+  anMinutes: number;
+  inRoomMinutes: number;
+  episodes: number;
+  year: number;
+  month: number;
+  months: EpisodeOverview[];
 }

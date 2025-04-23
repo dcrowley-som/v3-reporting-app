@@ -1,0 +1,116 @@
+<p-toast></p-toast>
+<p-confirm-dialog></p-confirm-dialog>
+<p-toolbar>
+  <ng-template #start>
+    <h2 class="text-2xl">Cases Counts</h2>
+  </ng-template>
+  <ng-template #end>
+    <p-select [options]="dateRanges" [(ngModel)]="selectedDateRange" optionLabel="label" placeholder="Date Range" class="" />
+    <div [hidden]="customDates">
+      <p-floatlabel variant="on">
+        <p-datepicker class="ms-2"  inputId="custom_dates" showIcon iconDisplay="input"
+                      [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true" [numberOfMonths]="2">
+
+        </p-datepicker>
+        <label>Custom Dates</label>
+      </p-floatlabel>
+    </div>
+    <p-button class="ms-2" icon="pi pi-refresh" label="Refresh" (onClick)="refresh()"></p-button>
+  </ng-template>
+</p-toolbar>
+@if (result()) {
+  <div class="grid grid-col-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3 mt-4">
+    <div class="bg-white shadow-sm border border-slate-200 p-4 rounded-lg flex flex-col items-center">
+      <h4 class="font-medium text-xl text-sky-500">Cases</h4>
+      <h3 class="font-bold text-2xl">{{result().episodes | number}}</h3>
+    </div>
+    <div class="bg-white shadow-sm border border-slate-200 p-4 rounded-lg flex flex-col items-center">
+      <h4 class="font-medium text-xl text-teal-500">AN Minutes</h4>
+      <h3 class="font-bold text-2xl">{{result().anMinutes | number}}</h3>
+    </div>
+    <div class="bg-white shadow-sm border border-slate-200 p-4 rounded-lg flex flex-col items-center">
+      <h4 class="font-medium text-xl text-indigo-500">In Room Minutes</h4>
+      <h3 class="font-bold text-2xl">{{result().inRoomMinutes | number}}</h3>
+    </div>
+  </div>
+
+  <div class="mt-4 grid grid-cols-1 xl:grid-cols-2 gap-4">
+    <div>
+      <p-card>
+        <ng-template #header>
+          <div class="flex justify-between items-center p-4">
+            <h4 class="font-medium text-xl">Categories</h4>
+            <div class="flex items-center">
+              <div class="text-sm me-3">Sort By</div>
+              <p-select size="small" [options]="sortCols" optionLabel="label"
+                        [(ngModel)]="sortCol" placeholder="Sort By"></p-select>
+            </div>
+          </div>
+        </ng-template>
+        <p-chart #categoriesChart
+          type="bar" [data]="categoryChartData()" [options]="categoryChartOptions"
+                 (onDataSelect)="onCategoriesChart($event)"
+        />
+      </p-card>
+      @if (servicesResult()) {
+        <div class="mt-4">
+          <p-card>
+            <ng-template #header>
+              <div class="flex justify-between items-center p-4">
+                <h4 class="font-medium text-xl">Top 10 Services</h4>
+                <div class="flex items-center">
+                  <div class="text-sm me-3">Sort By</div>
+                  <p-select size="small" [options]="sortCols" optionLabel="label"
+                            [(ngModel)]="sortColServices" placeholder="Sort By"></p-select>
+                </div>
+              </div>
+            </ng-template>
+            <p-chart type="bar" [data]="servicesChartData()" [options]="categoryChartOptions"
+
+            />
+          </p-card>
+        </div>
+      }
+      @if (proceduresResult()) {
+        <div class="mt-4">
+          <p-card>
+            <ng-template #header>
+              <div class="flex justify-between items-center p-4">
+                <h4 class="font-medium text-xl">Top 10 Procedures</h4>
+                <div class="flex items-center">
+                  <div class="text-sm me-3">Sort By</div>
+                  <p-select size="small" [options]="sortCols" optionLabel="label"
+                            [(ngModel)]="sortColProcedures" placeholder="Sort By"></p-select>
+                </div>
+              </div>
+            </ng-template>
+            <p-chart type="bar" [data]="proceduresChartData()" [options]="categoryChartOptions"  />
+          </p-card>
+        </div>
+      }
+    </div>
+    <div>
+      @if (providersResult()) {
+        <div>
+          <p-card>
+            <ng-template #header>
+              <div class="flex justify-between items-center p-4">
+                <h4 class="font-medium text-xl">Providers</h4>
+                <div class="flex items-center">
+                  <div class="text-sm me-3">Sort By</div>
+                  <p-select size="small" [options]="sortCols" optionLabel="label"
+                            [(ngModel)]="sortColProviders" placeholder="Sort By"></p-select>
+                </div>
+              </div>
+            </ng-template>
+            <p-chart (onDataSelect)="onProvidersChart($event)"
+              height="1700px" type="bar" [data]="providersChartData()" [options]="categoryChartOptions"  />
+          </p-card>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+
+

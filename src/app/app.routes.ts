@@ -8,6 +8,10 @@ import {AssignmentsOverviewComponent} from './assignments/assignments.overview/a
 import {AssignmentsProviderComponent} from './assignments/assignments.provider/assignments.provider.component';
 import {AssignmentsConcurrencyComponent} from './assignments/assignments.concurrency/assignments.concurrency.component';
 import {UnmatchedComponent} from './invoices/unmatched/unmatched.component';
+import {
+  AssignmentsDailysnapshotComponent
+} from './assignments/assignments.dailysnapshot/assignments.dailysnapshot.component';
+import {CasesCountComponent} from './cases/cases.count/cases.count.component';
 
 export const routes: Routes = [
   {
@@ -21,6 +25,9 @@ export const routes: Routes = [
       {
         path: 'cases',
         component: CasesOverviewComponent
+      },{
+        path: 'cases/count',
+        component: CasesCountComponent
       }, {
         path: 'cases/monthly',
         component: CasesMonthlyComponent
@@ -40,6 +47,10 @@ export const routes: Routes = [
       {
         path: 'assignments/concurrency',
         component: AssignmentsConcurrencyComponent
+      },
+      {
+        path: 'assignments/daily-snapshot',
+        component: AssignmentsDailysnapshotComponent
       },
       {
         path: 'billing/unmatched',

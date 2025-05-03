@@ -11,6 +11,11 @@ import {finalize, forkJoin, map} from 'rxjs';
 import {AssignmentService} from '../../services/assignment.service';
 import {EpisodeService} from '../../services/episode.service';
 import {PickList} from 'primeng/picklist';
+import {Panel} from 'primeng/panel';
+import {TableModule} from 'primeng/table';
+import {MintutesToHoursPipe} from '../../pipes/mintutes-to-hours.pipe';
+import {Tooltip} from 'primeng/tooltip';
+import {EpisodeBarComponent} from './episode-bar.component';
 
 @Component({
   selector: 'app-assignments.dailysnapshot',
@@ -22,7 +27,12 @@ import {PickList} from 'primeng/picklist';
     FloatLabel,
     ProgressSpinner,
     Toolbar,
-    PickList
+    PickList,
+    Panel,
+    TableModule,
+    MintutesToHoursPipe,
+    Tooltip,
+    EpisodeBarComponent
   ],
   templateUrl: './assignments.dailysnapshot.component.html',
   styleUrl: './assignments.dailysnapshot.component.scss',
@@ -36,6 +46,7 @@ export class AssignmentsDailysnapshotComponent implements OnInit {
   public results = signal<any[]>([]);
   public rangeDate: Date | undefined;
   public selectedProviders:MenuItem[] = [];
+  public hours = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7];
 
   constructor(
     private messageService: MessageService,

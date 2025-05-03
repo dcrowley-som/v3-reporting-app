@@ -40,3 +40,64 @@
     </ng-template>
   </p-pickList>
 </div>
+@if (results()) {
+  <p-panel styleClass="mt-4">
+    <p-table [value]="results()" showGridlines stripedRows>
+      <ng-template #header>
+        <tr>
+          <th>Provider</th>
+          <th>Assigned</th>
+          <th>Cases</th>
+          <th>Hours</th>
+          <th>7-4</th>
+          <th>4-7</th>
+          <th>7-11</th>
+          <th>11-7</th>
+          <th>Base U</th>
+          <th>Time U</th>
+          <th>Total U</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-row>
+        <tr>
+          <td>{{row.user}}</td>
+          <td>{{row.assignments}}</td>
+          <td [pTooltip]="row.episodes"
+          >{{row.episodes.length}}</td>
+          <td>{{row.count | minutesToHours}}</td>
+          <td>{{row.countSevenToFour | minutesToHours}}</td>
+          <td>{{row.countFourToSeven | minutesToHours}}</td>
+          <td>{{row.countSevenToEleven | minutesToHours}}</td>
+          <td>{{row.countElevenToSeven | minutesToHours}}</td>
+          <td>{{row.baseUnits}}</td>
+          <td>{{row.timeUnits}}</td>
+          <td>{{row.totalUnits}}</td>
+        </tr>
+        <tr >
+          <td colspan="11">
+
+            <table class="episode-bars-table">
+              <tr>
+                <td style="width: 100px"></td>
+                <td class="flex flex-1 justify-between">
+                  @for (hour of hours; track hour) {
+                    <span>{{hour}}</span>
+                  }
+                </td>
+              </tr>
+              @for (episode of row.episodes; track episode._id) {
+                <tr>
+                  <td style="width: 100px">{{episode.episodeId}}</td>
+                  <td class="">
+                    <app-episode-bar [episode]="episode"></app-episode-bar>
+                  </td>
+                </tr>
+              }
+            </table>
+          </td>
+
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-panel>
+}

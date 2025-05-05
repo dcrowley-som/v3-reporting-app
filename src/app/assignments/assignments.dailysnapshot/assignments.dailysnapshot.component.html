@@ -42,6 +42,10 @@
 </div>
 @if (results()) {
   <p-panel styleClass="mt-4">
+    <div class="mt-0 mb-2 flex justify-end">
+      <p-button pTooltip="Toggle ALL Charts" styleClass="m-0 p-0"
+                icon="pi pi-chart-bar" [rounded]="true" severity="secondary" (onClick)="toggleAllCharts()"></p-button>
+    </div>
     <p-table [value]="results()" showGridlines stripedRows>
       <ng-template #header>
         <tr>
@@ -56,6 +60,8 @@
           <th>Base U</th>
           <th>Time U</th>
           <th>Total U</th>
+          <th>
+          </th>
         </tr>
       </ng-template>
       <ng-template #body let-row>
@@ -72,31 +78,20 @@
           <td>{{row.baseUnits}}</td>
           <td>{{row.timeUnits}}</td>
           <td>{{row.totalUnits}}</td>
-        </tr>
-        <tr >
-          <td colspan="11">
-
-            <table class="episode-bars-table">
-              <tr>
-                <td style="width: 100px"></td>
-                <td class="flex flex-1 justify-between">
-                  @for (hour of hours; track hour) {
-                    <span>{{hour}}</span>
-                  }
-                </td>
-              </tr>
-              @for (episode of row.episodes; track episode._id) {
-                <tr>
-                  <td style="width: 100px">{{episode.episodeId}}</td>
-                  <td class="">
-                    <app-episode-bar [episode]="episode"></app-episode-bar>
-                  </td>
-                </tr>
-              }
-            </table>
+          <td>
+            <p-button pTooltip="Toggle Chart"
+              icon="pi pi-chart-bar" [rounded]="true" [text]="true" severity="secondary" size="small" (onClick)="row.showChart = !row.showChart"></p-button>
           </td>
-
         </tr>
+        @if (row.showChart) {
+          <tr>
+            <td colspan="12">
+              <app-episode-bars (onEpisode)="onBarsEpisode($event)"
+                                [episodes]="row.episodes" [assignmentDate]="rangeDate" [ogLabels]="stringHours"></app-episode-bars>
+            </td>
+
+          </tr>
+        }
       </ng-template>
     </p-table>
   </p-panel>

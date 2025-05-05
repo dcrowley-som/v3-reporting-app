@@ -16,6 +16,7 @@ import {TableModule} from 'primeng/table';
 import {MintutesToHoursPipe} from '../../pipes/mintutes-to-hours.pipe';
 import {Tooltip} from 'primeng/tooltip';
 import {EpisodeBarComponent} from './episode-bar.component';
+import {EpisodeBarsComponent} from './episode-bars.component';
 
 @Component({
   selector: 'app-assignments.dailysnapshot',
@@ -32,7 +33,8 @@ import {EpisodeBarComponent} from './episode-bar.component';
     TableModule,
     MintutesToHoursPipe,
     Tooltip,
-    EpisodeBarComponent
+    EpisodeBarComponent,
+    EpisodeBarsComponent
   ],
   templateUrl: './assignments.dailysnapshot.component.html',
   styleUrl: './assignments.dailysnapshot.component.scss',
@@ -46,17 +48,30 @@ export class AssignmentsDailysnapshotComponent implements OnInit {
   public results = signal<any[]>([]);
   public rangeDate: Date | undefined;
   public selectedProviders:MenuItem[] = [];
+  private allCharts = false;
   public hours = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7];
+  stringHours: string[];
 
   constructor(
     private messageService: MessageService,
     private assignmentsService: AssignmentService,
     private episodeService: EpisodeService,
   ) {
+    this.stringHours = this.hours.map((num: number) => {
+      return num.toString();
+    })
   }
 
   ngOnInit() {
     this.getLists();
+  }
+
+  public toggleAllCharts() {
+    this.allCharts = !this.allCharts;
+    if (!this.results()) {return;}
+    for (const row of this.results()) {
+      row.showChart = this.allCharts;
+    }
   }
 
   private getLists(): void {
@@ -99,5 +114,9 @@ export class AssignmentsDailysnapshotComponent implements OnInit {
         this.results.set(data.result);
       });
 
+  }
+
+  onBarsEpisode($event: any) {
+    this.episodeService.episodeRow = $event;
   }
 }

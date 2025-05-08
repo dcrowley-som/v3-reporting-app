@@ -25,4 +25,25 @@ export class AppService {
   public get appVersion(): string {
     return this.env.appVersion;
   }
+
+  /**
+   * Calculate the simple moving average from stock prices.
+   * @param {Array} prices - The list of prices.
+   * @param {number} interval - The number of periods to calculate.
+   * @return {Array} The list of SMA value.
+   */
+  public simpleMovingAverage = (prices: number[], interval: number): number[] => {
+    let index = interval - 1;
+    const length = prices.length + 1;
+    let results: number[] = [];
+
+    while (index < length) {
+      index = index + 1;
+      const intervalSlice = prices.slice(index - interval, index);
+      const sum = intervalSlice.reduce((prev, curr) => prev + curr, 0);
+      results.push(sum / interval);
+    }
+
+    return results;
+  }
 }

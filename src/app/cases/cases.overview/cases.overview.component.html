@@ -46,7 +46,7 @@
         <div class="text-amber-500">{{totals().prevFy[selectedMetric()] | number}}</div>
       </div>
       <p-chart height="200" class="w-full"
-               type="line" [data]="topFyData()" [options]="topChartOptions" />
+               type="line" [data]="topFyData()" [options]="fyChartOptions" />
     </div>
     <div class="bg-white shadow-sm border border-slate-200 p-4 rounded-lg flex flex-col items-center">
       <h4 class="font-medium text-xl text-sky-500">Rolling 12 Months</h4>
@@ -56,7 +56,7 @@
         <div class="text-amber-500">{{totals().prevRolling[selectedMetric()] | number}}</div>
       </div>
       <p-chart height="200" class="w-full"
-               type="line" [data]="topRollingData()" [options]="topChartOptions" />
+               type="line" [data]="topRollingData()" [options]="rollingChartOptions" />
     </div>
   </div>
 
@@ -73,26 +73,34 @@
           <th>Category</th>
           <th>Prev-FY</th>
           <th>FY-TD</th>
+          <th>% &#9650;</th>
           <th>Prev-Rolling</th>
           <th>Rolling-12</th>
+          <th>% &#9650;</th>
         </tr>
       </ng-template>
       <ng-template #body let-row>
         <tr>
           <td>{{row.category}}</td>
           <td>{{row.prevFy[selectedMetric()] | number}}</td>
-          <td [ngClass]="diffClass(row.prevFy, row.fy)">{{row.fy[selectedMetric()] | number}}</td>
+          <td>{{row.fy[selectedMetric()] | number}}</td>
+          <td [innerHTML]="row.prevFy[selectedMetric()] | coloredPercChange: row.fy[selectedMetric()] : true">
+
+          </td>
           <td>{{row.prevRolling[selectedMetric()] | number}}</td>
-          <td [ngClass]="diffClass(row.prevRolling, row.rolling)">{{row.rolling[selectedMetric()] | number}}</td>
+          <td>{{row.rolling[selectedMetric()] | number}}</td>
+          <td [innerHTML]="row.prevRolling[selectedMetric()] | coloredPercChange: row.rolling[selectedMetric()] : true">
         </tr>
       </ng-template>
       <ng-template #footer>
         <tr>
           <td class="font-bold">Totals</td>
           <td class="font-bold">{{totals().prevFy[selectedMetric()] | number}}</td>
-          <td [ngClass]="diffClass(totals().prevFy, totals().fy)" class="font-bold">{{totals().fy[selectedMetric()] | number}}</td>
+          <td class="font-bold">{{totals().fy[selectedMetric()] | number}}</td>
+          <td [innerHTML]="totals().prevFy[selectedMetric()] | coloredPercChange: totals().fy[selectedMetric()] : true">
           <td class="font-bold">{{totals().prevRolling[selectedMetric()] | number}}</td>
-          <td [ngClass]="diffClass(totals().prevRolling, totals().rolling)" class="font-bold">{{totals().rolling[selectedMetric()] | number}}</td>
+          <td class="font-bold">{{totals().rolling[selectedMetric()] | number}}</td>
+          <td [innerHTML]="totals().prevRolling[selectedMetric()] | coloredPercChange: totals().rolling[selectedMetric()] : true">
         </tr>
       </ng-template>
     </p-table>

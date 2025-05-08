@@ -42,11 +42,20 @@
 </div>
 @if (results()) {
   <p-panel styleClass="mt-4">
-    <div class="mt-0 mb-2 flex justify-end">
-      <p-button pTooltip="Toggle ALL Charts" styleClass="m-0 p-0"
-                icon="pi pi-chart-bar" [rounded]="true" severity="secondary" (onClick)="toggleAllCharts()"></p-button>
+    <div class="mt-0 mb-2 flex justify-between">
+
     </div>
-    <p-table [value]="results()" showGridlines stripedRows>
+    <p-table [value]="results()" showGridlines stripedRows #dt [columns]="cols" exportFilename="atlas_daily_snapshot" [exportFunction]="onExport.bind(this)"
+    >
+      @if (cols) {
+        <ng-template #caption>
+          <div class="flex justify-between">
+            <p-button icon="pi pi-external-link" label="Export" (click)="dt.exportCSV()" />
+            <p-button pTooltip="Toggle ALL Charts" styleClass=""
+                      icon="pi pi-chart-bar" [rounded]="true" (onClick)="toggleAllCharts()"></p-button>
+          </div>
+        </ng-template>
+      }
       <ng-template #header>
         <tr>
           <th>Provider</th>
@@ -68,8 +77,7 @@
         <tr>
           <td>{{row.user}}</td>
           <td>{{row.assignments}}</td>
-          <td [pTooltip]="row.episodes"
-          >{{row.episodes.length}}</td>
+          <td>{{row.episodes.length}}</td>
           <td>{{row.count | minutesToHours}}</td>
           <td>{{row.countSevenToFour | minutesToHours}}</td>
           <td>{{row.countFourToSeven | minutesToHours}}</td>

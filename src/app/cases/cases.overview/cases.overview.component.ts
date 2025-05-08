@@ -12,7 +12,6 @@ import {Toast} from 'primeng/toast';
 import {UIChart} from 'primeng/chart';
 import {finalize, forkJoin, map} from 'rxjs';
 import {ConfirmDialog} from 'primeng/confirmdialog';
-import {Router} from '@angular/router';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {EpisodeService} from '../../services/episode.service';
 import {EpisodeMonthly, EpisodeTable} from '../../models/episode-monthly';
@@ -21,21 +20,26 @@ import {RadioButton} from 'primeng/radiobutton';
 import {EpisodeMonthlyColumnPipe} from '../../pipes/episode-monthly-column.pipe';
 import {Panel} from 'primeng/panel';
 import {TableModule} from 'primeng/table';
+import {AppService} from '../../services/app.service';
+import {MovingAvgPipe} from '../../pipes/moving-avg.pipe';
+import {ColoredPercChangePipe} from '../../pipes/colored-perc-change.pipe';
 
 @Component({
   selector: 'app-cases.overview',
   imports: [Toolbar, Select, FormsModule, DatePicker, FloatLabel, Button, Card, DecimalPipe, Toast, UIChart,
-    ConfirmDialog, ProgressSpinner, MultiSelect, RadioButton, EpisodeMonthlyColumnPipe, NgForOf, Panel, TableModule, NgClass],
+    ConfirmDialog, ProgressSpinner, MultiSelect, RadioButton, EpisodeMonthlyColumnPipe, NgForOf, Panel, TableModule, NgClass, ColoredPercChangePipe],
   templateUrl: './cases.overview.component.html',
   standalone: true,
   styleUrl: './cases.overview.component.scss',
-  providers: [MessageService, ConfirmationService]
+  providers: [MessageService, ConfirmationService, MovingAvgPipe]
 })
 export class CasesOverviewComponent implements OnInit {
   public isLoading = false;
   public selectedCategories: any[] = [];
   public selectedMetric = signal<string>('episodes');
-  topChartOptions: any;
+  private topChartOptions: any;
+  public fyChartOptions: any;
+  public rollingChartOptions: any;
   public categories = signal<any[]>([]);
   public fyResults = signal<EpisodeMonthly[]>([]);
   public prevFYResults = signal<EpisodeMonthly[]>([]);
@@ -70,6 +74,8 @@ export class CasesOverviewComponent implements OnInit {
 
   constructor(
     private episodeService: EpisodeService,
+    private appService: AppService,
+    private movingAvgPipe: MovingAvgPipe,
   ) {
     this.topChartOptions = episodeService.topChartOptions;
   }
@@ -116,10 +122,21 @@ export class CasesOverviewComponent implements OnInit {
   }
 
   private chartData(results: any[], prev: any[], dateLabel: string, metric: string, r: number, g: number, b: number): any {
+    const metricVals = results.map((row: any) => row[metric]);
     return {
       labels: results
         .map(row => row._id.month + '/' + row._id.year),
       datasets: [
+        // {
+        //   label: 'Trend',
+        //   backgroundColor: 'rgb(0,0,0,0.8)',
+        //   borderColor: 'rgb(' + r + ',' + g + ',' + b + ')',
+        //   // data: this.appService.simpleMovingAverage(results
+        //   //   .map((row: any) => row[metric]),6),
+        //   data: this.movingAvgPipe.transform(metricVals, 'SMA', 3),
+        //   fill: false,
+        //   tension: 0.4
+        // },
         {
           label: dateLabel,
           backgroundColor: 'rgb(' + r + ',' + g + ',' + b + ', 0.8)',
@@ -142,7 +159,26 @@ export class CasesOverviewComponent implements OnInit {
     }
   }
 
+  private getMinMax(nums: number[]): any {
+    const max = Math.max(...nums);
+    const min = Math.min(...nums);
+    const diff = max - min;
+    const pad = diff * .8;
+    return {
+      min: min - pad,
+      max: max + pad
+    };
+  }
+
   public topFyData = linkedSignal(() => {
+    const fys = this.fyResults().map((item: any) => item[this.selectedMetric()]);
+    const prevs = this.prevFYResults().map((item: any) => item[this.selectedMetric()]);
+    const minMax = this.getMinMax(fys.concat(prevs));
+    const config = this.topChartOptions;
+    config.scales.y.min = minMax.min;
+    config.scales.y.max = minMax.max;
+    this.rollingChartOptions = config;
+    this.fyChartOptions = config;
     return this.chartData(this.fyResults(), this.prevFYResults(), 'FY-TD', this.selectedMetric(), 14, 165, 233);
   });
 

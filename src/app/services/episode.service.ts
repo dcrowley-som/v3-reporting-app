@@ -59,6 +59,7 @@ export class EpisodeService {
           }
         },
         y: {
+          min: 0,
           ticks: {
             color: 'grey',
             font: {

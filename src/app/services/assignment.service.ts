@@ -37,6 +37,10 @@ export class AssignmentService {
     return this.http.get(this.apiUrl + 'reporting/assignments/list', this.appService.basicHeaders);
   }
 
+  assignmentsLimitedList() {
+    return this.http.get(this.apiUrl + 'reporting/assignments/limited-list', this.appService.basicHeaders);
+  }
+
   concurrency(range: string, dates: Date[] | undefined, provider: string, assignment: string) {
 
     let start = null;
@@ -50,5 +54,9 @@ export class AssignmentService {
 
   dailySnapshot(providers: string[], date: Date) {
     return this.http.post(this.apiUrl + 'reporting/assignments/daily-snapshot', {providers: {list: providers}, date}, this.appService.basicHeaders);
+  }
+
+  calendar(start: Date, end: Date) {
+    return this.http.post(this.apiUrl + 'reporting/assignments/calendar', {start, end}, this.appService.basicHeaders);
   }
 }

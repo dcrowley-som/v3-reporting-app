@@ -17,6 +17,7 @@ import {MinutesToHoursPipe} from '../../pipes/minutes-to-hours.pipe';
 import {Tooltip} from 'primeng/tooltip';
 import {EpisodeBarComponent} from './episode-bar.component';
 import {EpisodeBarsComponent} from './episode-bars.component';
+import {MultiSelect} from 'primeng/multiselect';
 //
 // interface ExportColumn {
 //   title: string;
@@ -43,7 +44,8 @@ interface Column {
     MinutesToHoursPipe,
     Tooltip,
     EpisodeBarComponent,
-    EpisodeBarsComponent
+    EpisodeBarsComponent,
+    MultiSelect
   ],
   templateUrl: './assignments.dailysnapshot.component.html',
   styleUrl: './assignments.dailysnapshot.component.scss',
@@ -55,6 +57,8 @@ export class AssignmentsDailysnapshotComponent implements OnInit {
   public isLoading = false;
   public selectedProvider: MenuItem | undefined;
   public providersList = signal<any[]>([]);
+  public deptCatsList: any[] = [];
+  public selectedDeptCat: any;
   public results = signal<any[]>([]);
   public rangeDate: Date | undefined;
   public selectedProviders:MenuItem[] = [];
@@ -109,6 +113,10 @@ export class AssignmentsDailysnapshotComponent implements OnInit {
         }
       }))
       .subscribe((allSources: any) => {
+        this.deptCatsList = allSources._selects.deptCats.map((row: any) => {
+          row.searchable = row._id;
+          return row;
+        });
         this.providersList.set(allSources._selects.providers.map((row: any) => {
           row.searchable = row.last + ', ' + row.first;
           return row;
@@ -190,5 +198,9 @@ export class AssignmentsDailysnapshotComponent implements OnInit {
           //do nothing
     }
     return d;
+  }
+
+  onDeptCats($event: any) {
+    this.selectedProviders = [];
   }
 }

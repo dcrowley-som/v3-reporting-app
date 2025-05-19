@@ -6,7 +6,9 @@
     </h2>
   </ng-template>
   <ng-template #end>
-    <div>
+    <div class="flex justify-end">
+      <p-multi-select display="chip" (onChange)="onDeptCats($event)"
+                      [options]="deptCatsList" [ngModel]="selectedDeptCat" optionLabel="searchable" placeholder="Quick Select Group"></p-multi-select>
       <p-floatlabel variant="on">
         <p-datepicker class="ms-2"  inputId="custom_dates" showIcon iconDisplay="input"
                       [(ngModel)]="rangeDate" [readonlyInput]="true">

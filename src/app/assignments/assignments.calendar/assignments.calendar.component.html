@@ -1,0 +1,29 @@
+<p-toast></p-toast>
+<p-toolbar>
+  <ng-template #start>
+    <h2 class="flex items-center text-2xl">
+      Assignments Calendar
+    </h2>
+  </ng-template>
+  <ng-template #end>
+    <p-multi-select [options]="scheduleList" [(ngModel)]="selectedSchedules" (onChange)="onSchedules()"
+                    styleClass="me-2" optionLabel="label" placeholder="Select Schedule" display="chip"
+    ></p-multi-select>
+    <p-multi-select [options]="aNameList()" [(ngModel)]="selectedANames" (onChange)="onANames()"
+                    styleClass="me-2" optionLabel="label" placeholder="Select Assignments" display="chip"
+    ></p-multi-select>
+    <p-button icon="pi pi-refresh" label="Refresh" (onClick)="refresh()"></p-button>
+    <p-button styleClass="ms-2" severity="secondary" label="Clear" (onClick)="clear()"></p-button>
+  </ng-template>
+</p-toolbar>
+<div class="p-3">
+  <i><strong class="text-orange-600">Instructions:</strong> First Select a schedule(s), then select assignments, then click refresh.</i>
+</div>
+<!--@if (isLoading) {-->
+<!--  <div class="card flex justify-center mt-4">-->
+<!--    <p-progress-spinner [style]="{ width: '50px', height: '50px' }" />-->
+<!--  </div>-->
+<!--}-->
+<div class="mt-4">
+  <full-calendar [options]="calendarOptions()" [events]="filteredEvents()"></full-calendar>
+</div>

@@ -32,6 +32,13 @@
           </div>
           <ul class="list-none p-0 m-0 overflow-hidden">
             <li>
+              <a pRipple [routerLink]="['/', 'assignments', 'calendar']"
+                 class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">
+                <i class="pi pi-calendar mr-2"></i>
+                <span class="font-medium">Calendar</span>
+              </a>
+            </li>
+            <li>
               <a pRipple [routerLink]="['/', 'assignments']"
                  class="flex items-center cursor-pointer p-4 rounded-border text-zinc-200 hover:bg-zinc-100 hover:text-zinc-700  duration-150 transition-colors p-ripple">
                 <i class="pi pi-calendar mr-2"></i>

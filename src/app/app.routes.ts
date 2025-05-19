@@ -12,6 +12,7 @@ import {
   AssignmentsDailysnapshotComponent
 } from './assignments/assignments.dailysnapshot/assignments.dailysnapshot.component';
 import {CasesCountComponent} from './cases/cases.count/cases.count.component';
+import {AssignmentsCalendarComponent} from './assignments/assignments.calendar/assignments.calendar.component';
 
 export const routes: Routes = [
   {
@@ -39,6 +40,10 @@ export const routes: Routes = [
       {
         path: 'assignments',
         component: AssignmentsOverviewComponent
+      },
+      {
+        path: 'assignments/calendar',
+        component: AssignmentsCalendarComponent
       },
       {
         path: 'assignments/provider',

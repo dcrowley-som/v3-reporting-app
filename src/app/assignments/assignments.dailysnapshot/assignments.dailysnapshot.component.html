@@ -7,8 +7,10 @@
   </ng-template>
   <ng-template #end>
     <div class="flex justify-end">
-      <p-multi-select display="chip" (onChange)="onDeptCats($event)"
-                      [options]="deptCatsList" [ngModel]="selectedDeptCat" optionLabel="searchable" placeholder="Quick Select Group"></p-multi-select>
+      <p-multi-select (onChange)="onDeptCats($event)"
+                      [options]="deptCatsList" [(ngModel)]="selectedDeptCats" optionLabel="searchable" placeholder="Select Group"></p-multi-select>
+      <p-multi-select class="ms-2"
+                      [options]="filteredProvidersList" [(ngModel)]="selectedProviders" optionLabel="searchable" placeholder="Select Providers"></p-multi-select>
       <p-floatlabel variant="on">
         <p-datepicker class="ms-2"  inputId="custom_dates" showIcon iconDisplay="input"
                       [(ngModel)]="rangeDate" [readonlyInput]="true">
@@ -20,28 +22,31 @@
     <p-button class="ms-2" icon="pi pi-refresh" label="Refresh" (onClick)="refresh()"></p-button>
   </ng-template>
 </p-toolbar>
+<div class="p-3">
+  <i><strong class="text-orange-600">Instructions:</strong> First Select a Group(s), then select Providers, then Date, then click refresh.</i>
+</div>
 @if (isLoading) {
   <div class="card flex justify-center mt-4">
     <p-progress-spinner [style]="{ width: '50px', height: '50px' }" />
   </div>
 }
-<div class="mt-4">
-  <p-pickList
-    [showSourceControls]="false"
-    [showTargetControls]="false"
-    [source]="providersList()"
-    [target]="selectedProviders"
-    filterBy="searchable"
-    [dragdrop]="true"
-    [responsive]="true"
-    sourceFilterPlaceholder="Search by name"
-    targetFilterPlaceholder="Search by name"
-  >
-    <ng-template let-item #item>
-      {{ item.searchable }}
-    </ng-template>
-  </p-pickList>
-</div>
+<!--<div class="mt-4">-->
+<!--  <p-pickList-->
+<!--    [showSourceControls]="false"-->
+<!--    [showTargetControls]="false"-->
+<!--    [source]="providersList()"-->
+<!--    [target]="selectedProviders"-->
+<!--    filterBy="searchable"-->
+<!--    [dragdrop]="true"-->
+<!--    [responsive]="true"-->
+<!--    sourceFilterPlaceholder="Search by name"-->
+<!--    targetFilterPlaceholder="Search by name"-->
+<!--  >-->
+<!--    <ng-template let-item #item>-->
+<!--      {{ item.searchable }}-->
+<!--    </ng-template>-->
+<!--  </p-pickList>-->
+<!--</div>-->
 @if (results()) {
   <p-panel styleClass="mt-4">
     <div class="mt-0 mb-2 flex justify-between">

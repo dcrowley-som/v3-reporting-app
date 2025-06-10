@@ -1,4 +1,4 @@
-import {Component, OnInit, signal} from '@angular/core';
+import {Component, computed, OnInit, signal} from '@angular/core';
 import {Toast} from 'primeng/toast';
 import {Button} from 'primeng/button';
 import {DatePicker} from 'primeng/datepicker';
@@ -7,7 +7,7 @@ import {ProgressSpinner} from 'primeng/progressspinner';
 import {Toolbar} from 'primeng/toolbar';
 import {MenuItem, MessageService} from 'primeng/api';
 import {FormsModule} from '@angular/forms';
-import {finalize, forkJoin, map} from 'rxjs';
+import {finalize, forkJoin, map, single} from 'rxjs';
 import {AssignmentService} from '../../services/assignment.service';
 import {EpisodeService} from '../../services/episode.service';
 import {PickList} from 'primeng/picklist';
@@ -58,10 +58,11 @@ export class AssignmentsDailysnapshotComponent implements OnInit {
   public selectedProvider: MenuItem | undefined;
   public providersList = signal<any[]>([]);
   public deptCatsList: any[] = [];
-  public selectedDeptCat: any;
+  public selectedDeptCats: any[] = [];
+  public filteredProvidersList: any[] = [];
   public results = signal<any[]>([]);
   public rangeDate: Date | undefined;
-  public selectedProviders:MenuItem[] = [];
+  public selectedProviders: MenuItem[] = [];
   private allCharts = false;
   public hours = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7];
   stringHours: string[];
@@ -125,7 +126,7 @@ export class AssignmentsDailysnapshotComponent implements OnInit {
   }
 
   public refresh() {
-    if (this.selectedProviders.length === 0) {
+    if (this.filteredProvidersList.length === 0) {
       this.messageService.add({ severity: 'warn', summary: 'No Providers', detail: 'Please select providers.' });
       return;
     }
@@ -133,7 +134,7 @@ export class AssignmentsDailysnapshotComponent implements OnInit {
       this.messageService.add({ severity: 'warn', summary: 'No Date', detail: 'Please select a date.' });
       return;
     }
-    const providers: string[] = this.selectedProviders.map((item: MenuItem) => {
+    const providers: string[] = this.filteredProvidersList.map((item: MenuItem) => {
       return item['_id'];
     });
     this.isLoading = true;
@@ -202,5 +203,11 @@ export class AssignmentsDailysnapshotComponent implements OnInit {
 
   onDeptCats($event: any) {
     this.selectedProviders = [];
+    const cats: string[] = $event.value.map((item: any) => {
+      return item._id;
+    });
+    this.filteredProvidersList = this.providersList().filter((item: any) => {
+      return cats.indexOf(item.departmentCategory) >= 0;
+    });
   }
 }

@@ -1,4 +1,4 @@
-import {Component, computed, OnInit, signal} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {Toast} from 'primeng/toast';
 import {Button} from 'primeng/button';
 import {DatePicker} from 'primeng/datepicker';
@@ -10,12 +10,10 @@ import {FormsModule} from '@angular/forms';
 import {finalize, forkJoin, map, single} from 'rxjs';
 import {AssignmentService} from '../../services/assignment.service';
 import {EpisodeService} from '../../services/episode.service';
-import {PickList} from 'primeng/picklist';
 import {Panel} from 'primeng/panel';
 import {TableModule} from 'primeng/table';
 import {MinutesToHoursPipe} from '../../pipes/minutes-to-hours.pipe';
 import {Tooltip} from 'primeng/tooltip';
-import {EpisodeBarComponent} from './episode-bar.component';
 import {EpisodeBarsComponent} from './episode-bars.component';
 import {MultiSelect} from 'primeng/multiselect';
 //
@@ -38,12 +36,10 @@ interface Column {
     FloatLabel,
     ProgressSpinner,
     Toolbar,
-    PickList,
     Panel,
     TableModule,
     MinutesToHoursPipe,
     Tooltip,
-    EpisodeBarComponent,
     EpisodeBarsComponent,
     MultiSelect
   ],

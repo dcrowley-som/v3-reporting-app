@@ -1,13 +1,9 @@
-import {Component, inject, linkedSignal, OnInit, signal, ViewChild} from '@angular/core';
-import {ConfirmationService, MenuItem, MessageService} from 'primeng/api';
+import {Component, linkedSignal, OnInit, signal} from '@angular/core';
+import {ConfirmationService, MessageService} from 'primeng/api';
 import {Toolbar} from 'primeng/toolbar';
-import {Select} from 'primeng/select';
 import {FormsModule} from '@angular/forms';
-import {DatePicker} from 'primeng/datepicker';
-import {FloatLabel} from 'primeng/floatlabel';
 import {Button} from 'primeng/button';
-import {Card} from 'primeng/card';
-import {DecimalPipe, NgClass, NgForOf} from '@angular/common';
+import {DecimalPipe} from '@angular/common';
 import {Toast} from 'primeng/toast';
 import {UIChart} from 'primeng/chart';
 import {finalize, forkJoin, map} from 'rxjs';
@@ -17,7 +13,6 @@ import {EpisodeService} from '../../services/episode.service';
 import {EpisodeMonthly, EpisodeTable} from '../../models/episode-monthly';
 import {MultiSelect} from 'primeng/multiselect';
 import {RadioButton} from 'primeng/radiobutton';
-import {EpisodeMonthlyColumnPipe} from '../../pipes/episode-monthly-column.pipe';
 import {Panel} from 'primeng/panel';
 import {TableModule} from 'primeng/table';
 import {AppService} from '../../services/app.service';
@@ -26,8 +21,8 @@ import {ColoredPercChangePipe} from '../../pipes/colored-perc-change.pipe';
 
 @Component({
   selector: 'app-cases.overview',
-  imports: [Toolbar, Select, FormsModule, DatePicker, FloatLabel, Button, Card, DecimalPipe, Toast, UIChart,
-    ConfirmDialog, ProgressSpinner, MultiSelect, RadioButton, EpisodeMonthlyColumnPipe, NgForOf, Panel, TableModule, NgClass, ColoredPercChangePipe],
+  imports: [Toolbar, FormsModule, Button, DecimalPipe, Toast, UIChart,
+    ConfirmDialog, ProgressSpinner, MultiSelect, RadioButton, Panel, TableModule, ColoredPercChangePipe],
   templateUrl: './cases.overview.component.html',
   standalone: true,
   styleUrl: './cases.overview.component.scss',

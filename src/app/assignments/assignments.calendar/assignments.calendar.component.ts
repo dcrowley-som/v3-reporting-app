@@ -1,14 +1,13 @@
-import {Component, linkedSignal, OnDestroy, OnInit, signal} from '@angular/core';
-import {MenuItem, MessageService} from 'primeng/api';
+import {Component, OnDestroy, OnInit, signal} from '@angular/core';
+import {MessageService} from 'primeng/api';
 import {FullCalendarModule} from '@fullcalendar/angular';
 import {CalendarOptions} from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import {ProgressSpinner} from 'primeng/progressspinner';
 import {Toolbar} from 'primeng/toolbar';
 import {Toast} from 'primeng/toast';
 import {AssignmentService} from '../../services/assignment.service';
-import {finalize, forkJoin, map, take} from 'rxjs';
+import {finalize, forkJoin, map} from 'rxjs';
 import {MultiSelect} from 'primeng/multiselect';
 import {FormsModule} from '@angular/forms';
 import {Button} from 'primeng/button';
@@ -19,7 +18,6 @@ import {AssignmentsCalendarEventModalComponent} from './assignments.calendar.eve
   selector: 'app-assignments.calendar',
   imports: [
     FullCalendarModule,
-    ProgressSpinner,
     Toolbar,
     Toast,
     MultiSelect,
